@@ -25,16 +25,16 @@
 
 选择最新版本进行下载,下载过程如下图
 
-![avatar](https://gitee.com/hanpan1935/lims/raw/master/document/image/download/1.png)
+![avatar](https://github.com/hanpan1935/lims/blob/main/document/image/download/1.png)
 
-![avatar](https://gitee.com/hanpan1935/lims/raw/master/document/image/download/2.png)
+![avatar](https://github.com/hanpan1935/lims/blob/main/document/image/download/2.png)
 
 
 
 2.  解压安装包
 
 
-![avatar](https://gitee.com/hanpan1935/lims/raw/master/document/image/download/3.png)
+![avatar](https://github.com/hanpan1935/lims/blob/main/document/image/download/3.png)
 
 其中
 Server 为服务端程序
@@ -51,7 +51,7 @@ DbMigrator 为数据库迁移程序
 1 运行数据库迁移程序
 注意:只再首次运行或者版本更新的的的时候运行数据库迁移程序,用来生成默认数据库,平时不需要运行(日常使用只需要运行Server和Client)
 
-![avatar](https://gitee.com/hanpan1935/lims/raw/master/document/image/installApp/1.png)
+![avatar](https://github.com/hanpan1935/lims/blob/main/document/image/installApp/1.png)
 
 打开 DbMigrator/net6.0
 双击运行 Lanpuda.Lims.DbMigrator.exe
@@ -59,7 +59,7 @@ DbMigrator 为数据库迁移程序
 2 运行服务端程序 
 双击运行 Lanpuda.Lims.HttpApi.Host.exe
 
-![avatar](https://gitee.com/hanpan1935/lims/raw/master/document/image/installApp/2.png)
+![avatar](https://github.com/hanpan1935/lims/blob/main/document/image/installApp/2.png)
 
 
 注意:
@@ -67,7 +67,7 @@ DbMigrator 为数据库迁移程序
 
 如果运行成功,打开浏览器输入  http://localhost:5000  会显示如下图所示页面
 
-![avatar](https://gitee.com/hanpan1935/lims/raw/master/document/image/installApp/swger.png)
+![avatar](https://github.com/hanpan1935/lims/blob/main/document/image/installApp/swger.png)
 
 
 
@@ -75,7 +75,7 @@ DbMigrator 为数据库迁移程序
 打开 Client\net6.0-windows
 双击运行 Lanpuda.Lims.Client.exe
 
-![avatar](https://gitee.com/hanpan1935/lims/raw/master/document/image/installApp/3.png)
+![avatar](https://github.com/hanpan1935/lims/blob/main/document/image/installApp/3.png)
 
 
 
