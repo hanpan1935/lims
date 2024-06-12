@@ -1,0 +1,104 @@
+﻿<UserControl x:Class="Lanpuda.Lims.UI.BasicInformations.Products.Edits.ProductEditView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:Lanpuda.Lims.UI.BasicInformations.Products.Edits"
+             mc:Ignorable="d" 
+             xmlns:dxmvvm="http://schemas.devexpress.com/winfx/2008/xaml/mvvm"
+             xmlns:hc="https://handyorg.github.io/handycontrol"
+             xmlns:langs ="clr-namespace:Lanpuda.Lims.UI.Assets.Langs"
+             d:DesignHeight="400" d:DesignWidth="600">
+    <dxmvvm:Interaction.Behaviors>
+        <dxmvvm:EventToCommand EventName="Loaded" Command="{Binding InitializeAsyncCommand}"/>
+        <dxmvvm:WindowService AllowSetWindowOwner="True" WindowStartupLocation="CenterOwner" WindowShowMode="Dialog">
+            <dxmvvm:WindowService.WindowStyle>
+                <Style TargetType="Window">
+                    <Setter Property="WindowStyle" Value="SingleBorderWindow" />
+                    <Setter Property="ShowInTaskbar" Value="False"></Setter>
+                </Style>
+            </dxmvvm:WindowService.WindowStyle>
+        </dxmvvm:WindowService>
+        <dxmvvm:CurrentWindowService />
+    </dxmvvm:Interaction.Behaviors>
+    <Grid>
+        <DockPanel Background="White" IsEnabled="{Binding IsLoading,Converter={StaticResource Boolean2BooleanReConverter}}">
+            <Border BorderThickness="1,0,1,1"  DockPanel.Dock="Bottom" Height="60" BorderBrush="{StaticResource AntDesign.BorderColorBaseBrush}"  >
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+                    <Button Style="{StaticResource ButtonDefault}" Command="{Binding DataContext.CloseCommand,RelativeSource= {RelativeSource AncestorType=UserControl}}"  Content="关闭" Margin="10,0" Cursor="Hand"></Button>
+                    <Button Style="{StaticResource ButtonPrimary}" Command="{Binding DataContext.SaveAsyncCommand,RelativeSource= {RelativeSource AncestorType=UserControl}}"  Content="保存" Margin="10,0" Cursor="Hand"></Button>
+                </StackPanel>
+            </Border>
+            <Border BorderThickness="1" BorderBrush="{StaticResource AntDesign.BorderColorBaseBrush}" >
+                <StackPanel Margin="10">
+                   
+                    <hc:Row Margin="0,30,0,0" Gutter="20">
+                        <hc:Col Span="12">
+                            <hc:TextBox hc:TitleElement.Title="{x:Static langs:Lang.Name}" hc:TitleElement.TitlePlacement="Left" hc:InfoElement.Necessary="True"
+                                        Text="{Binding Model.Name ,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged , ValidatesOnDataErrors=True ,ValidatesOnExceptions=True,NotifyOnValidationError=True}"
+                                        >
+                            </hc:TextBox>
+                        </hc:Col>
+                        <hc:Col Span="12" Cursor="">
+                            <hc:TextBox hc:TitleElement.Title="{x:Static langs:Lang.Unit}" hc:TitleElement.TitlePlacement="Left" hc:InfoElement.Necessary="True"
+                                        Text="{Binding Model.Unit ,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged , ValidatesOnDataErrors=True ,ValidatesOnExceptions=True,NotifyOnValidationError=True}"
+                                        >
+                            </hc:TextBox>
+                        </hc:Col>
+                    </hc:Row>
+                    <hc:Row Margin="0,30,0,0" Gutter="20">
+                        <hc:Col Span="12">
+                            <hc:TextBox hc:TitleElement.Title="{x:Static langs:Lang.Number}" hc:TitleElement.TitlePlacement="Left" hc:InfoElement.Necessary="False"
+                                        Text="{Binding Model.Number ,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged , ValidatesOnDataErrors=True ,ValidatesOnExceptions=True,NotifyOnValidationError=True}"
+                                        ></hc:TextBox>
+                        </hc:Col>
+                        <hc:Col Span="12">
+                            <hc:ComboBox hc:TitleElement.Title="{x:Static langs:Lang.ProductType}" hc:TitleElement.TitlePlacement="Left" ShowClearButton="True"
+                                         ItemsSource="{Binding ProductTypeSource,UpdateSourceTrigger=PropertyChanged}" SelectedValuePath="Id" DisplayMemberPath="DisplayValue"
+                                         SelectedValue="{Binding Model.DicProductTypeId ,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged , ValidatesOnDataErrors=True ,ValidatesOnExceptions=True,NotifyOnValidationError=True}"
+                                         ToolTip="可以在数据字典中维护下拉菜单"
+                                         ></hc:ComboBox>
+                        </hc:Col>
+                    </hc:Row>
+                    <hc:Row Margin="0,30,0,0" Gutter="20">
+                        <hc:Col Span="12">
+                            <hc:TextBox hc:TitleElement.Title="{x:Static langs:Lang.Spec}" hc:TitleElement.TitlePlacement="Left" hc:InfoElement.Necessary="False"
+                                        Text="{Binding Model.Spec ,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged , ValidatesOnDataErrors=True ,ValidatesOnExceptions=True,NotifyOnValidationError=True}"
+                                        >
+                            </hc:TextBox>
+                        </hc:Col>
+                        <hc:Col Span="12">
+                            <hc:ElementGroup Orientation="Horizontal" Layout="Stack">
+                                <hc:ElementGroup.ItemsPanel>
+                                    <ItemsPanelTemplate>
+                                        <Grid>
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="Auto"/>
+                                                <ColumnDefinition Width="*"/>
+                                                <ColumnDefinition Width="Auto"/>
+                                            </Grid.ColumnDefinitions>
+                                        </Grid>
+                                    </ItemsPanelTemplate>
+                                </hc:ElementGroup.ItemsPanel>
+                                <TextBlock  Text="默认标准*" VerticalAlignment="Center" Margin="0,0,0,0" Grid.Column="0" Width="55"></TextBlock>
+                                <TextBox Text="{Binding Model.StandardDescription,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged,ValidatesOnDataErrors=True}" Grid.Column="1" IsReadOnly="True"/>
+                                <Button Grid.Column="2" Style="{StaticResource ButtonPrimary}"
+                                        Command="{Binding ShowSelectStandardViewCommand}"
+                                        hc:IconElement.Geometry="{StaticResource SearchGeometry}"/>
+                            </hc:ElementGroup>
+                        </hc:Col>
+                    </hc:Row>
+                    <hc:Row Margin="0,30,0,0" Gutter="20">
+                        <hc:Col Span="24">
+                            <hc:TextBox hc:TitleElement.Title="{x:Static langs:Lang.Remark}" hc:TitleElement.TitlePlacement="Left" 
+                                        Text="{Binding Model.Remark ,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged , ValidatesOnDataErrors=True ,ValidatesOnExceptions=True,NotifyOnValidationError=True}"
+                                        >
+                            </hc:TextBox>
+                        </hc:Col>
+                    </hc:Row>
+                </StackPanel>
+            </Border>
+        </DockPanel>
+        <hc:LoadingCircle Visibility="{Binding IsLoading, UpdateSourceTrigger=PropertyChanged,Converter={dxmvvm:BooleanToVisibilityConverter}}"/>
+    </Grid>
+</UserControl>

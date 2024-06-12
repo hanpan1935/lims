@@ -1,0 +1,100 @@
+﻿<UserControl x:Class="Lanpuda.Lims.UI.InspectionTasks.Edits.InspectionTaskEditView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:Lanpuda.Lims.UI.InspectionTasks.Edits"
+             mc:Ignorable="d" 
+             xmlns:dxmvvm="http://schemas.devexpress.com/winfx/2008/xaml/mvvm"
+             xmlns:hc="https://handyorg.github.io/handycontrol"
+             d:DesignHeight="400" d:DesignWidth="600">
+    <dxmvvm:Interaction.Behaviors>
+        <dxmvvm:EventToCommand EventName="Loaded" Command="{Binding InitializeAsyncCommand}"/>
+        <dxmvvm:CurrentWindowService />
+        <dxmvvm:WindowService AllowSetWindowOwner="True" WindowStartupLocation="CenterScreen" WindowShowMode="Dialog" >
+            <dxmvvm:WindowService.WindowStyle>
+                <Style TargetType="Window">
+                    <Setter Property="WindowStyle" Value="SingleBorderWindow" />
+                    <Setter Property="SizeToContent" Value="Manual" />
+                    <Setter Property="ShowInTaskbar" Value="False"></Setter>
+                </Style>
+            </dxmvvm:WindowService.WindowStyle>
+        </dxmvvm:WindowService>
+    </dxmvvm:Interaction.Behaviors>
+    <Grid>
+        <DockPanel Background="White" IsEnabled="{Binding IsLoading,Converter={StaticResource Boolean2BooleanReConverter}}">
+            <Border BorderThickness="1,0,1,1"  DockPanel.Dock="Bottom" Height="60" BorderBrush="{StaticResource AntDesign.BorderColorBaseBrush}"  >
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+                    <Button Style="{StaticResource ButtonDefault}" Command="{Binding DataContext.CloseCommand,RelativeSource= {RelativeSource AncestorType=UserControl}}"  Content="关闭" Margin="10,0" Cursor="Hand"></Button>
+                    <Button Style="{StaticResource ButtonPrimary}" Command="{Binding DataContext.SaveAsyncCommand,RelativeSource= {RelativeSource AncestorType=UserControl}}"  Content="保存" Margin="10,0" Cursor="Hand"></Button>
+                </StackPanel>
+            </Border>
+            <Border BorderThickness="1" BorderBrush="{StaticResource AntDesign.BorderColorBaseBrush}" >
+                <StackPanel Margin="10">
+                    <hc:Row Margin="0,30,0,0" Gutter="20">
+                        <hc:Col Span="12">
+                            <hc:TextBox hc:TitleElement.Title="检验记录" hc:TitleElement.TitlePlacement="Left" IsEnabled="False"
+                                        Text="{Binding Model.RecordNumber ,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}"
+                                        >
+                            </hc:TextBox>
+                        </hc:Col>
+                        <hc:Col Span="12" Cursor="">
+                            <hc:TextBox hc:TitleElement.Title="检验项目" hc:TitleElement.TitlePlacement="Left" IsEnabled="False"
+                                        Text="{Binding Model.InspectionItemShortName ,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}"
+                                        >
+                            </hc:TextBox>
+                        </hc:Col>
+                    </hc:Row>
+                    <hc:Row Margin="0,30,0,0" Gutter="20">
+                        <hc:Col Span="12">
+                            <hc:DatePicker hc:TitleElement.Title="检验日期" hc:TitleElement.TitlePlacement="Left" hc:InfoElement.Necessary="True"
+                                           SelectedDate="{Binding Model.InspectionDate ,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged , ValidatesOnDataErrors=True ,ValidatesOnExceptions=True,NotifyOnValidationError=True}"
+                                           ></hc:DatePicker>
+                        </hc:Col>
+                        <hc:Col Span="12">
+                            <hc:ElementGroup Orientation="Horizontal" Layout="Stack">
+                                <hc:ElementGroup.ItemsPanel>
+                                    <ItemsPanelTemplate>
+                                        <Grid>
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="Auto"/>
+                                                <ColumnDefinition Width="*"/>
+                                                <ColumnDefinition Width="Auto"/>
+                                            </Grid.ColumnDefinitions>
+                                        </Grid>
+                                    </ItemsPanelTemplate>
+                                </hc:ElementGroup.ItemsPanel>
+                                <TextBlock  Text="检验设备" VerticalAlignment="Center" Margin="0,0,0,0" Grid.Column="0" Width="60" ></TextBlock>
+                                <TextBox Text="{Binding Model.EquipmentName,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged,ValidatesOnDataErrors=True}" Grid.Column="1" IsReadOnly="True"/>
+                                <Button Grid.Column="2" Style="{StaticResource ButtonPrimary}"
+                                        Command="{Binding ShowSelectEquipmentViewCommand}"
+                                        hc:IconElement.Geometry="{StaticResource SearchGeometry}"/>
+                            </hc:ElementGroup>
+                        </hc:Col>
+                    </hc:Row>
+                    <hc:Row Margin="0,30,0,0" Gutter="20">
+                        <hc:Col Span="12">
+                            <hc:TextBox hc:TitleElement.Title="检验人" hc:TitleElement.TitlePlacement="Left" hc:InfoElement.Necessary="False"
+                                        Text="{Binding Model.Inspector ,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged , ValidatesOnDataErrors=True ,ValidatesOnExceptions=True,NotifyOnValidationError=True}"
+                                        >
+                            </hc:TextBox>
+                        </hc:Col>
+                        <hc:Col Span="12">
+                            <hc:NumericUpDown Value="{Binding Model.Priority,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}"
+                                              hc:InfoElement.TitlePlacement="Left" hc:InfoElement.Title="优先级" Style="{StaticResource NumericUpDownExtend}" />
+                        </hc:Col>
+                    </hc:Row>
+                    <hc:Row Margin="0,30,0,0" Gutter="20">
+                        <hc:Col Span="12">
+                            <hc:TextBox hc:TitleElement.Title="备注" hc:TitleElement.TitlePlacement="Left" 
+                                        Text="{Binding Model.Remark ,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged , ValidatesOnDataErrors=True ,ValidatesOnExceptions=True,NotifyOnValidationError=True}"
+                                        >
+                            </hc:TextBox>
+                        </hc:Col>
+                    </hc:Row>
+                </StackPanel>
+            </Border>
+        </DockPanel>
+        <hc:LoadingCircle Visibility="{Binding IsLoading, UpdateSourceTrigger=PropertyChanged,Converter={dxmvvm:BooleanToVisibilityConverter}}"/>
+    </Grid>
+</UserControl>

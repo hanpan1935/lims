@@ -1,0 +1,340 @@
+﻿<UserControl x:Class="Lanpuda.Lims.UI.InventoryManagement.SafetyStocks.SafetyStockPagedView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:Lanpuda.Lims.UI.InventoryManagement.SafetyStocks"
+             mc:Ignorable="d" 
+             xmlns:hc="https://handyorg.github.io/handycontrol" 
+             xmlns:dxmvvm="http://schemas.devexpress.com/winfx/2008/xaml/mvvm"
+             xmlns:widget="clr-namespace:Lanpuda.Client.Widget;assembly=Lanpuda.Client.Widget" 
+             xmlns:mvvm="clr-namespace:Lanpuda.Client.Mvvm;assembly=Lanpuda.Client.Mvvm"
+             xmlns:alc="clr-namespace:Lanpuda.Client.Theme.ACL;assembly=Lanpuda.Client.Theme"
+             xmlns:converters="clr-namespace:Lanpuda.Client.Theme.Converters;assembly=Lanpuda.Client.Theme"
+             xmlns:permissions ="clr-namespace:Lanpuda.Lims.Permissions;assembly=Lanpuda.Lims.Application.Contracts"
+             d:DesignHeight="900" d:DesignWidth="1600">
+    <UserControl.Resources>
+        <converters:DisplayAttributeToStringConverter x:Key="DisplayAttributeToStringConverter"></converters:DisplayAttributeToStringConverter>
+        <converters:BoolToStringConverter x:Key="BoolToStringConverter"></converters:BoolToStringConverter>
+    </UserControl.Resources>
+    <dxmvvm:Interaction.Behaviors>
+        <dxmvvm:EventToCommand EventName="Loaded" Command="{Binding InitializeAsyncCommand}"/>
+        <dxmvvm:WindowService AllowSetWindowOwner="True" WindowStartupLocation="CenterScreen" WindowShowMode="Dialog" >
+            <dxmvvm:WindowService.WindowStyle>
+                <Style TargetType="Window">
+                    <Setter Property="WindowStyle" Value="SingleBorderWindow" />
+                    <Setter Property="SizeToContent" Value="Manual" />
+                    <Setter Property="ShowInTaskbar" Value="False"></Setter>
+                </Style>
+            </dxmvvm:WindowService.WindowStyle>
+        </dxmvvm:WindowService>
+    </dxmvvm:Interaction.Behaviors>
+    <Grid Background="{StaticResource AntDesign.PrimaryBackgroundColorBrush}">
+        <DockPanel Background="Transparent" IsEnabled="{Binding IsLoading, Converter={StaticResource Boolean2BooleanReConverter}}">
+            <widget:PageHeaderSimple DockPanel.Dock="Top" Title="{Binding PageTitle}"/>
+            <!--搜索-->
+            <StackPanel DockPanel.Dock="Top" Orientation="Vertical" Margin="5" Background="White">
+                <hc:Row Margin="5" Gutter="20">
+                    <hc:Col Span="4">
+                        <hc:TextBox Text="{Binding RequestModel.Number,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}"
+                                    hc:TitleElement.Title="采购单号" hc:TitleElement.TitlePlacement="Left"></hc:TextBox>
+                    </hc:Col>
+
+                    <hc:Col Span="4">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto"></ColumnDefinition>
+                                <ColumnDefinition Width="*"></ColumnDefinition>
+                            </Grid.ColumnDefinitions>
+                            <TextBlock Text="供应商" VerticalAlignment="Center" Margin="5,0"></TextBlock>
+                            <hc:AutoCompleteTextBox ItemsSource="{Binding RequestModel.SupplierSource}" Width="Auto" Grid.Column="1"
+                                                    hc:TitleElement.Title="供应商全称" hc:TitleElement.TitlePlacement="Left"
+                                                    SelectedValuePath="Id" DisplayMemberPath="FullName" SelectedValue="{Binding RequestModel.SupplierId}" 
+                                                    Text="{Binding RequestModel.SupplierSearchText}" />
+                        </Grid>
+                    </hc:Col>
+
+                    <hc:Col Span="4">
+                        <hc:DatePicker Text="{Binding RequestModel.RequiredDateStart,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}" 
+                                    hc:TitleElement.Title="要求交期起始" hc:TitleElement.TitlePlacement="Left"></hc:DatePicker>
+                    </hc:Col>
+                    <hc:Col Span="4">
+                        <hc:DatePicker Text="{Binding RequestModel.RequiredDateEnd,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}" 
+                                    hc:TitleElement.Title="要求交期截止" hc:TitleElement.TitlePlacement="Left"></hc:DatePicker>
+                    </hc:Col>
+
+                    <hc:Col Span="4">
+                        <hc:ComboBox ItemsSource="{Binding RequestModel.IsConfirmedSource}" ShowClearButton="True"
+                                     SelectedValue="{Binding RequestModel.IsConfirmed}" 
+                                     DisplayMemberPath="Key"  SelectedValuePath="Value" 
+                                     hc:TitleElement.Title="是否确认" hc:TitleElement.TitlePlacement="Left"></hc:ComboBox>
+                    </hc:Col>
+
+                    <hc:Col Span="4">
+                        <hc:ComboBox ItemsSource="{Binding RequestModel.OrderTypeSource}" ShowClearButton="True"
+                                     SelectedValue="{Binding RequestModel.OrderType}" 
+                                     DisplayMemberPath="Key"  SelectedValuePath="Value" 
+                                     hc:TitleElement.Title="订单类型" hc:TitleElement.TitlePlacement="Left"></hc:ComboBox>
+                    </hc:Col>
+
+                    <hc:Col Span="4">
+                        <hc:ComboBox ItemsSource="{Binding RequestModel.CloseStatusSource}" ShowClearButton="True"
+                                     SelectedValue="{Binding RequestModel.CloseStatus}" 
+                                     DisplayMemberPath="Key"  SelectedValuePath="Value" 
+                                     hc:TitleElement.Title="订单状态" hc:TitleElement.TitlePlacement="Left"></hc:ComboBox>
+                    </hc:Col>
+                    <hc:Col Span="4">
+                        <StackPanel Orientation="Horizontal">
+                            <Button Content="查询" Command="{Binding QueryAsyncCommand}" Style="{DynamicResource ButtonPrimary}" Margin="0,0,0,0"   Cursor="Hand"></Button>
+                            <Button Content="重置" Command="{Binding ResetAsyncCommand}" Style="{DynamicResource ButtonDefault}" Margin="20,0,0,0"  Cursor="Hand"></Button>
+                        </StackPanel>
+                    </hc:Col>
+                </hc:Row>
+                <hc:Row Margin="5">
+                    <hc:Col Span="6">
+                        <StackPanel Orientation="Horizontal">
+                            <Button Command="{Binding CreateCommand}" Content="新建" Cursor="Hand" 
+                                    Visibility="Visible"
+                                    Style="{StaticResource ButtonPrimary}"></Button>
+                        </StackPanel>
+                    </hc:Col>
+                </hc:Row>
+            </StackPanel>
+            <!--分页-->
+            <StackPanel DockPanel.Dock="Bottom"  Orientation="Horizontal" HorizontalAlignment="Right" >
+                <ComboBox  hc:DropDownElement.ConsistentWidth="False" ItemsSource="{Binding PageSizeList}" 
+                           DisplayMemberPath="Key" SelectedValuePath="Value" 
+                           SelectedValue="{Binding DataCountPerPage}" >
+                </ComboBox>
+                <hc:Pagination MaxPageCount="{Binding MaxPageCount ,UpdateSourceTrigger=PropertyChanged}"   
+                                   DataCountPerPage="{Binding DataCountPerPage,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}" 
+                                   PageIndex="{Binding PageIndex,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}"  
+                                   IsJumpEnabled="True" HorizontalAlignment="Right" Margin="0,0,10,0">
+                    <hc:Interaction.Triggers>
+                        <hc:EventTrigger EventName="PageUpdated">
+                            <hc:EventToCommand Command="{Binding PageUpdatedAsyncCommand}" PassEventArgsToCommand="True" />
+                        </hc:EventTrigger>
+                    </hc:Interaction.Triggers>
+                </hc:Pagination>
+            </StackPanel>
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="*"/>
+                </Grid.RowDefinitions>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="6*"/>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="4*"/>
+                </Grid.ColumnDefinitions>
+                <DataGrid Style="{StaticResource AntDesign.DataGridCommon.Paged}">
+                    <DataGrid.Columns >
+                        <DataGridTextColumn Binding="{Binding Number}"                Header="采购单号" Width="1*" MinWidth="150"/>
+                        <DataGridTextColumn Binding="{Binding SupplierFullName}"     Header="供应商全称" Width="1*" MinWidth="100"/>
+                        <DataGridTextColumn Binding="{Binding SupplierShortName}"     Header="供应商简称" Width="1*" MinWidth="100"/>
+                        <DataGridTextColumn Binding="{Binding RequiredDate,StringFormat={}{0:yyyy/MM/dd}}"       Header="要求交期"   Width="1*" MinWidth="100"/>
+                        <DataGridTextColumn Binding="{Binding PromisedDate,StringFormat={}{0:yyyy/MM/dd}}"       Header="承诺交期" Width="1*" MinWidth="100"/>
+                        <DataGridTextColumn Binding="{Binding IsConfirmed,Converter={StaticResource BoolToStringConverter}}"        Header="是否确认"     Width="1*" MinWidth="100"/>
+                        <DataGridTextColumn Binding="{Binding CloseStatus,Converter={StaticResource DisplayAttributeToStringConverter}}"        Header="订单状态"     Width="1*" MinWidth="100"/>
+                        <DataGridTextColumn Binding="{Binding OrderType,Converter={StaticResource DisplayAttributeToStringConverter}}"         Header="订单类型"     Width="1*" MinWidth="100"/>
+                    </DataGrid.Columns>
+                    <DataGrid.CellStyle>
+                        <Style TargetType="DataGridCell" BasedOn="{StaticResource AntDesign.DataGridCellStyle}">
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding IsConfirmed}" Value="false">
+                                    <Setter Property="Foreground" Value="{StaticResource WarningBrush}"></Setter>
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </DataGrid.CellStyle>
+                </DataGrid>
+                <GridSplitter Grid.Row="0" Grid.Column="1" Width="3" Margin="2,0,2,0" Background="{StaticResource AntDesign.BorderColorBaseBrush}"
+                               VerticalAlignment="Stretch" HorizontalAlignment="Center"/>
+                <DockPanel Background="{StaticResource AntDesign.PrimaryBackgroundColorBrush}"
+                           Visibility="{Binding SelectedModel,Converter={StaticResource Object2VisibilityConverter}}" Margin="0,0" Grid.Column="2">
+                    <StackPanel Width="50" DockPanel.Dock="Right" Background="White" Margin="5,0">
+                        <Button Command="{Binding UpdateCommand}" Content="编辑" Cursor="Hand" 
+                                Visibility="{alc:ACL ERP.PurchaseManagement.BusinessProcess.PurchaseOrder.Update}"
+                                Style="{StaticResource ButtonPrimary.Small}" Margin="0,10"></Button>
+                        <Button Command="{Binding ConfirmeAsyncCommand}" Content="确认" Cursor="Hand" 
+                                Visibility="{alc:ACL ERP.PurchaseManagement.BusinessProcess.PurchaseOrder.Confirm}"
+                                Style="{StaticResource ButtonPrimary.Small}" Margin="0,10"></Button>
+                        <Button Command="{Binding CloseOrderAsyncCommand}"  Content="关闭" Cursor="Hand" 
+                                Visibility="{alc:ACL ERP.PurchaseManagement.BusinessProcess.PurchaseOrder.Close}"
+                                ToolTip="关闭后将不能进行后续流程: 来料通知 > 采购入库"
+                                Style="{StaticResource ButtonPrimary.Small}" Margin="0,10"></Button>
+                        <Button Command="{Binding DeleteAsyncCommand}" Content="删除" Cursor="Hand" 
+                                Visibility="{alc:ACL ERP.PurchaseManagement.BusinessProcess.PurchaseOrder.Delete}"
+                                Style="{StaticResource ButtonPrimary.Small}" Margin="0,10"></Button>
+                    </StackPanel>
+
+                    <ScrollViewer>
+                        <Border Style="{StaticResource BorderRegion}" Margin="5">
+                            <StackPanel>
+                                <Border  Margin="10,0">
+                                    <StackPanel>
+                                        <hc:Divider Content="基本信息" Margin="0,10"/>
+                                        <hc:Row Margin="0,10,0,0">
+                                            <hc:Col Span="12">
+                                                <hc:TextBox hc:TitleElement.Title="订单编号:"  IsReadOnly="True"
+                                            BorderThickness="0" Text="{Binding SelectedModel.Number}"
+                                            hc:TitleElement.TitlePlacement="Left">
+                                                </hc:TextBox>
+                                            </hc:Col>
+
+                                        </hc:Row>
+                                        <hc:Row Margin="0,10,0,0">
+                                            <hc:Col Span="12">
+                                                <hc:TextBox hc:TitleElement.Title="供应商全称:" IsReadOnly="True"
+                                                    BorderThickness="0" Text="{Binding SelectedModel.SupplierFullName}"
+                                                    hc:TitleElement.TitlePlacement="Left">
+                                                </hc:TextBox>
+                                            </hc:Col>
+                                            <hc:Col Span="12">
+                                                <hc:TextBox hc:TitleElement.Title="供应商简称:" IsReadOnly="True"
+                                            BorderThickness="0" Text="{Binding SelectedModel.SupplierShortName,Mode=OneWay}"
+                                            hc:TitleElement.TitlePlacement="Left"></hc:TextBox>
+                                            </hc:Col>
+                                        </hc:Row>
+                                        <hc:Row Margin="0,10,0,0">
+                                            <hc:Col Span="12">
+                                                <hc:TextBox hc:TitleElement.Title="订单状态:" IsReadOnly="True"
+                                                    BorderThickness="0" Text="{Binding SelectedModel.CloseStatus,Converter={StaticResource DisplayAttributeToStringConverter}}"
+                                                    hc:TitleElement.TitlePlacement="Left" ></hc:TextBox>
+                                            </hc:Col>
+                                            <hc:Col Span="12">
+                                                <hc:TextBox hc:TitleElement.Title="订单来源:" IsReadOnly="True"
+                                            BorderThickness="0" Text="{Binding SelectedModel.OrderType,Mode=OneWay,Converter={StaticResource DisplayAttributeToStringConverter}}"
+                                            hc:TitleElement.TitlePlacement="Left"></hc:TextBox>
+                                            </hc:Col>
+                                        </hc:Row>
+                                        <hc:Row Margin="0,10,0,0">
+                                            <hc:Col Span="12">
+                                                <hc:TextBox hc:TitleElement.Title="要求交期:" IsReadOnly="True"
+                                            BorderThickness="0" Text="{Binding SelectedModel.RequiredDate,Mode=OneWay,StringFormat={}{0:yyyy-MM-dd}}"
+                                            hc:TitleElement.TitlePlacement="Left">
+                                                </hc:TextBox>
+                                            </hc:Col>
+                                            <hc:Col Span="12">
+                                                <hc:TextBox hc:TitleElement.Title="承诺交期:" IsReadOnly="True"
+                                            BorderThickness="0" Text="{Binding SelectedModel.PromisedDate,Mode=OneWay,StringFormat={}{0:yyyy-MM-dd}}"
+                                            hc:TitleElement.TitlePlacement="Left"></hc:TextBox>
+                                            </hc:Col>
+                                        </hc:Row>
+
+                                        <hc:Row Margin="0,10,0,0">
+                                            <hc:Col Span="12">
+                                                <hc:TextBox hc:TitleElement.Title="收货人:" IsReadOnly="True"
+                                            BorderThickness="0" Text="{Binding SelectedModel.Contact}"
+                                            hc:TitleElement.TitlePlacement="Left">
+                                                </hc:TextBox>
+                                            </hc:Col>
+                                            <hc:Col Span="12">
+                                                <hc:TextBox hc:TitleElement.Title="收货人电话:" IsReadOnly="True"
+                                            BorderThickness="0" Text="{Binding SelectedModel.ContactTel}"
+                                            hc:TitleElement.TitlePlacement="Left"></hc:TextBox>
+                                            </hc:Col>
+                                        </hc:Row>
+                                        <hc:Row Margin="0,10,0,0">
+                                            <hc:Col Span="24">
+                                                <hc:TextBox hc:TitleElement.Title="送货地址:" IsReadOnly="True"
+                                            BorderThickness="0" Text="{Binding SelectedModel.ShippingAddress}"
+                                            hc:TitleElement.TitlePlacement="Left">
+                                                </hc:TextBox>
+                                            </hc:Col>
+                                        </hc:Row>
+                                        <hc:Row Margin="0,10,0,0">
+                                            <hc:Col Span="24">
+                                                <hc:TextBox hc:TitleElement.Title="订单备注:" IsReadOnly="True"
+                                                    BorderThickness="0" Text="{Binding SelectedModel.Remark}"
+                                                    hc:TitleElement.TitlePlacement="Left">
+                                                </hc:TextBox>
+                                            </hc:Col>
+                                        </hc:Row>
+                                    </StackPanel>
+                                </Border>
+
+                                <Border CornerRadius="4,4,0,0" Style="{StaticResource BorderRegion}" BorderThickness="0">
+                                    <StackPanel>
+                                        <hc:Divider Content="订单明细"  Margin="0,10"/>
+                                        <DataGrid ItemsSource="{Binding SelectedModel.Details}" 
+                                                  Margin="0"
+                                                  HorizontalScrollBarVisibility="Auto" 
+                                            Style="{StaticResource AntDesign.DataGridCommon}">
+                                            <DataGrid.Columns>
+                                                <DataGridTextColumn Binding="{Binding PromiseDate,StringFormat={}{0:yyyy/MM/dd}}" Header="承诺交期"/>
+                                                <DataGridTextColumn Binding="{Binding ProductName}" Header="产品名称"/>
+                                                <DataGridTextColumn Binding="{Binding ProductSpec}" Header="产品规格"/>
+                                                <DataGridTextColumn Binding="{Binding ProductUnitName}" Header="产品单位"/>
+                                                <DataGridTextColumn Binding="{Binding Quantity}" Header="采购数量"/>
+                                                <DataGridTextColumn Binding="{Binding Price}" Header="含税单价"/>
+                                                <DataGridTextColumn Binding="{Binding TaxRate}" Header="税率"/>
+                                                <DataGridTextColumn Binding="{Binding Remark}" Header="备注"/>
+                                            </DataGrid.Columns>
+                                        </DataGrid>
+                                    </StackPanel>
+                                </Border>
+
+                                <Border  Margin="10,0">
+                                    <StackPanel>
+                                        <hc:Divider Content="其他信息" Margin="0,10"/>
+
+                                        <hc:Row Margin="0,10,0,0">
+                                            <hc:Col Span="12">
+                                                <hc:TextBox hc:TitleElement.Title="创建人:" IsReadOnly="True"
+                                                     BorderThickness="0"   hc:TitleElement.TitlePlacement="Left">
+                                                    <hc:TextBox.Text>
+                                                        <MultiBinding StringFormat="{}{0}{1}">
+                                                            <Binding Path="SelectedModel.CreatorSurname" FallbackValue="" />
+                                                            <Binding Path="SelectedModel.CreatorName" FallbackValue="" />
+                                                        </MultiBinding>
+                                                    </hc:TextBox.Text>
+                                                </hc:TextBox>
+                                            </hc:Col>
+                                            <hc:Col Span="12">
+                                                <hc:TextBox hc:TitleElement.Title="创建时间:" IsReadOnly="True"
+                                            BorderThickness="0" Text="{Binding SelectedModel.CreationTime,StringFormat={}{0:yyyy-MM-dd HH:mm}}"
+                                            hc:TitleElement.TitlePlacement="Left">
+                                                </hc:TextBox>
+                                            </hc:Col>
+                                        </hc:Row>
+                                        <hc:Row Margin="0,10,0,0">
+                                            <hc:Col Span="12">
+                                                <hc:TextBox hc:TitleElement.Title="是否确认:" IsReadOnly="True"
+                                            BorderThickness="0" Text="{Binding SelectedModel.IsConfirmed,Mode=OneWay,Converter={StaticResource BoolToStringConverter}}"
+                                            hc:TitleElement.TitlePlacement="Left">
+                                                </hc:TextBox>
+                                            </hc:Col>
+                                            <hc:Col Span="12">
+                                                <hc:TextBox hc:TitleElement.Title="确认时间:" IsReadOnly="True"
+                                            BorderThickness="0" Text="{Binding SelectedModel.ConfirmedTime,StringFormat={}{0:yyyy-MM-dd HH:mm}}"
+                                            hc:TitleElement.TitlePlacement="Left">
+                                                </hc:TextBox>
+                                            </hc:Col>
+                                        </hc:Row>
+
+                                        <hc:Row Margin="0,10,0,0">
+                                            <hc:Col Span="12">
+                                                <hc:TextBox hc:TitleElement.Title="确认人:" IsReadOnly="True"
+                                                            BorderThickness="0" 
+                                                            hc:TitleElement.TitlePlacement="Left">
+                                                    <hc:TextBox.Text>
+                                                        <MultiBinding StringFormat="{}{0}{1}">
+                                                            <Binding Path="SelectedModel.ConfirmeUserSurname" FallbackValue="" />
+                                                            <Binding Path="SelectedModel.ConfirmeUserName" FallbackValue="" />
+                                                        </MultiBinding>
+                                                    </hc:TextBox.Text>
+                                                </hc:TextBox>
+                                            </hc:Col>
+                                        </hc:Row>
+                                    </StackPanel>
+                                </Border>
+
+                            </StackPanel>
+                        </Border>
+                    </ScrollViewer>
+                </DockPanel>
+            </Grid>
+        </DockPanel>
+        <hc:LoadingCircle Visibility="{Binding IsLoading, UpdateSourceTrigger=PropertyChanged,Converter={dxmvvm:BooleanToVisibilityConverter}}"/>
+    </Grid>
+</UserControl>

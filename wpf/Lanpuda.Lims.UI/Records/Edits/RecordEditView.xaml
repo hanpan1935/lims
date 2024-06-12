@@ -1,0 +1,155 @@
+﻿<UserControl x:Class="Lanpuda.Lims.UI.Records.Edits.RecordEditView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:Lanpuda.Lims.UI.Records.Edits"
+             mc:Ignorable="d" 
+             xmlns:hc="https://handyorg.github.io/handycontrol" 
+             xmlns:widget="clr-namespace:Lanpuda.Client.Widget;assembly=Lanpuda.Client.Widget" 
+             xmlns:dxmvvm="http://schemas.devexpress.com/winfx/2008/xaml/mvvm"
+             xmlns:langs ="clr-namespace:Lanpuda.Lims.UI.Assets.Langs" xmlns:converters="clr-namespace:Lanpuda.Lims.UI.Assets.Converts"
+             d:DesignHeight="900" d:DesignWidth="1600">
+    <UserControl.Resources>
+        <converters:NullableDoubleConverter x:Key="NullableDoubleConverter"></converters:NullableDoubleConverter>
+    </UserControl.Resources>
+    <dxmvvm:Interaction.Behaviors>
+        <dxmvvm:EventToCommand EventName="Loaded" Command="{Binding InitializeAsyncCommand}"/>
+        <dxmvvm:WindowService AllowSetWindowOwner="True" WindowStartupLocation="CenterOwner" WindowShowMode="Dialog">
+            <dxmvvm:WindowService.WindowStyle>
+                <Style TargetType="Window">
+                    <Setter Property="WindowStyle" Value="SingleBorderWindow" />
+                    <Setter Property="ShowInTaskbar" Value="False"></Setter>
+                </Style>
+            </dxmvvm:WindowService.WindowStyle>
+        </dxmvvm:WindowService>
+        <dxmvvm:CurrentWindowService />
+    </dxmvvm:Interaction.Behaviors>
+    <Grid>
+        <DockPanel Background="{StaticResource AntDesign.PrimaryBackgroundColorBrush}" 
+               IsEnabled="{Binding IsLoading,Converter={StaticResource Boolean2BooleanReConverter}}">
+            <Border DockPanel.Dock="Top" Style="{StaticResource BorderRegion}" Margin="5">
+                <StackPanel>
+                    <hc:Row Margin="0,0,0,0" Gutter="20" Height="60" VerticalAlignment="Top">
+                        <hc:Col Span="6">
+                            <hc:ElementGroup Orientation="Horizontal" Layout="Stack">
+                                <hc:ElementGroup.ItemsPanel>
+                                    <ItemsPanelTemplate>
+                                        <Grid>
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="Auto"/>
+                                                <ColumnDefinition Width="*"/>
+                                                <ColumnDefinition Width="Auto"/>
+                                            </Grid.ColumnDefinitions>
+                                        </Grid>
+                                    </ItemsPanelTemplate>
+                                </hc:ElementGroup.ItemsPanel>
+                                <TextBlock Text="选择样品*" VerticalAlignment="Center" Margin="0,0,0,0" Grid.Column="0" Width="60"></TextBlock>
+                                <TextBox Text="{Binding Model.SampleNumber,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged,ValidatesOnDataErrors=True}" Grid.Column="1" IsReadOnly="True"/>
+                                <Button Grid.Column="2" Style="{StaticResource ButtonPrimary}"
+                                        Command="{Binding ShowSelectSampleViewCommand}"
+                                        hc:IconElement.Geometry="{StaticResource SearchGeometry}"/>
+                            </hc:ElementGroup>
+                        </hc:Col>
+                        <hc:Col Span="4">
+                            <hc:TextBox hc:TitleElement.TitlePlacement="Left" hc:InfoElement.Title="产品物料" hc:InfoElement.Necessary="False" IsEnabled="False"
+                                    Text="{Binding Model.ProductName,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged , ValidatesOnDataErrors=True ,ValidatesOnExceptions=True,NotifyOnValidationError=True}">
+                            </hc:TextBox>
+                        </hc:Col>
+                        <hc:Col Span="4">
+                            <hc:ComboBox SelectedValue="{Binding Model.SelectRatingType,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}" 
+                                     ItemsSource="{Binding RatingTypeSource}" DisplayMemberPath="DisplayValue" 
+                                     ShowClearButton="True"
+                                     hc:TitleElement.Title="{x:Static langs:Lang.RatingType}" hc:TitleElement.TitlePlacement="Left"></hc:ComboBox>
+                        </hc:Col>
+                        <hc:Col Span="8">
+                            <hc:TextBox hc:TitleElement.TitlePlacement="Left" hc:InfoElement.Title="备注" hc:InfoElement.Necessary="False" 
+                                    Text="{Binding Model.Remark,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged , ValidatesOnDataErrors=True ,ValidatesOnExceptions=True,NotifyOnValidationError=True}">
+                            </hc:TextBox>
+                        </hc:Col>
+                    </hc:Row>
+                </StackPanel>
+            </Border>
+            <Border DockPanel.Dock="Bottom" Style="{StaticResource BorderRegion}" Margin="0">
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+                    <Button Command="{Binding CloseCommand}" Content="关闭" 
+                            Style="{StaticResource ButtonDefault}" Margin="10,0"></Button>
+                    <Button Command="{Binding SaveAsyncCommand}" Content="保存" CommandParameter="true" Style="{StaticResource ButtonPrimary}" Margin="10,0"></Button>
+                </StackPanel>
+            </Border>
+
+            <Border Style="{StaticResource BorderRegion}" Margin="5">
+                <DataGrid Style="{StaticResource AntDesign.DataGrid.Editable}" Margin="0" SelectionMode="Single" RowHeight="70"
+                          SelectedItem="{Binding Model.SelectedRow,Mode=TwoWay}" VerticalScrollBarVisibility="Auto" 
+                          hc:DataGridAttach.ShowRowNumber="True"  HeadersVisibility="All" CanUserSortColumns="False"
+                          ItemsSource="{Binding Model.Details,Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" >
+                    <DataGrid.Columns>
+                        <DataGridTextColumn Binding="{Binding InspectionItemShortName}" MinWidth="100" Header="检验项目" Width="1*"  IsReadOnly="False"/>
+                        <DataGridTemplateColumn CanUserSort="False"  Header="最小值" MinWidth="100">
+                            <DataGridTemplateColumn.CellTemplate>
+                                <DataTemplate>
+                                    <hc:TextBox Text="{Binding MinValue,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged,ValidatesOnDataErrors=True}">
+                                    </hc:TextBox>
+                                </DataTemplate>
+                            </DataGridTemplateColumn.CellTemplate>
+                        </DataGridTemplateColumn>
+
+                        <DataGridTemplateColumn CanUserSort="False"  Header="是否包含最小值" MinWidth="100"  Width="1*" >
+                            <DataGridTemplateColumn.CellTemplate>
+                                <DataTemplate>
+                                    <CheckBox IsChecked="{Binding HasMinValue,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}">
+                                    </CheckBox>
+                                </DataTemplate>
+                            </DataGridTemplateColumn.CellTemplate>
+                        </DataGridTemplateColumn>
+                        <DataGridTemplateColumn CanUserSort="False"  Header="最大值" MinWidth="100"  Width="1*">
+                            <DataGridTemplateColumn.CellTemplate>
+                                <DataTemplate>
+                                    <TextBox Text="{Binding MaxValue,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}">
+                                    </TextBox>
+                                </DataTemplate>
+                            </DataGridTemplateColumn.CellTemplate>
+                        </DataGridTemplateColumn>
+                        <DataGridTemplateColumn CanUserSort="False"  Header="是否包含最大值" MinWidth="100"  Width="1*">
+                            <DataGridTemplateColumn.CellTemplate>
+                                <DataTemplate>
+                                    <CheckBox IsChecked="{Binding HasMaxValue,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}">
+                                    </CheckBox>
+                                </DataTemplate>
+                            </DataGridTemplateColumn.CellTemplate>
+                        </DataGridTemplateColumn>
+                        <DataGridTemplateColumn CanUserSort="False"  Header="检验值" MinWidth="100"  Width="1*">
+                            <DataGridTemplateColumn.CellTemplate>
+                                <DataTemplate>
+                                    <hc:TextBox Text="{Binding ResultValue,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged,ValidatesOnDataErrors=True,Converter={StaticResource NullableDoubleConverter}}">
+                                    </hc:TextBox>
+                                </DataTemplate>
+                            </DataGridTemplateColumn.CellTemplate>
+                        </DataGridTemplateColumn>
+
+
+
+                        <DataGridTemplateColumn CanUserSort="False"  Header="判定结果*" MinWidth="100"  Width="1*">
+                            <DataGridTemplateColumn.CellTemplate>
+                                <DataTemplate>
+                                    <hc:ComboBox ItemsSource="{Binding IsQualifiedSource}" 
+                                                 DisplayMemberPath="Key" SelectedValuePath="Value" 
+                                                 SelectedValue="{Binding IsQualified,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}">
+                                    </hc:ComboBox>
+                                </DataTemplate>
+                            </DataGridTemplateColumn.CellTemplate>
+                        </DataGridTemplateColumn>
+                    </DataGrid.Columns>
+                    <DataGrid.ContextMenu>
+                        <ContextMenu  StaysOpen="true">
+                            <MenuItem Command="{Binding ShowSelectStandardViewCommand}"  Header="选择检验标准" Style="{StaticResource MenuItemBaseStyle}"/>
+                            <MenuItem Command="{Binding ShowSelectInspectionItemViewCommand}"  Header="添加检验项目" Style="{StaticResource MenuItemBaseStyle}"/>
+                            <MenuItem Command="{Binding DeleteSelectedRowCommand}"  Header="删除" Style="{StaticResource MenuItemBaseStyle}"/>
+                        </ContextMenu>
+                    </DataGrid.ContextMenu>
+                </DataGrid>
+            </Border>
+        </DockPanel>
+        <hc:LoadingCircle Visibility="{Binding IsLoading, UpdateSourceTrigger=PropertyChanged,Converter={dxmvvm:BooleanToVisibilityConverter}}"/>
+    </Grid>
+</UserControl>

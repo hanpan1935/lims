@@ -1,0 +1,68 @@
+﻿<UserControl x:Class="Lanpuda.Lims.UI.BasicInformations.Suppliers.Edits.SupplierEditView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:Lanpuda.Lims.UI.BasicInformations.Suppliers.Edits"
+             mc:Ignorable="d" 
+             xmlns:dxmvvm="http://schemas.devexpress.com/winfx/2008/xaml/mvvm"
+             xmlns:hc="https://handyorg.github.io/handycontrol" 
+             xmlns:widget="clr-namespace:Lanpuda.Client.Widget;assembly=Lanpuda.Client.Widget"
+             d:DesignHeight="300" d:DesignWidth="600">
+    <dxmvvm:Interaction.Behaviors>
+        <dxmvvm:EventToCommand EventName="Loaded" Command="{Binding InitializeAsyncCommand}"/>
+        <dxmvvm:CurrentWindowService />
+    </dxmvvm:Interaction.Behaviors>
+    <Grid>
+        <DockPanel Background="White" IsEnabled="{Binding IsLoading,Converter={StaticResource Boolean2BooleanReConverter}}">
+            <Border BorderThickness="1,0,1,1"  DockPanel.Dock="Bottom" Height="60" BorderBrush="{StaticResource AntDesign.BorderColorBaseBrush}"  >
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+                    <Button Style="{StaticResource ButtonDefault}" Command="{Binding DataContext.CloseCommand,RelativeSource= {RelativeSource AncestorType=UserControl}}"  Content="关闭" Margin="10,0" Cursor="Hand"></Button>
+                    <Button Style="{StaticResource ButtonPrimary}" Command="{Binding DataContext.SaveAsyncCommand,RelativeSource= {RelativeSource AncestorType=UserControl}}"  Content="保存" Margin="10,0" Cursor="Hand"></Button>
+                </StackPanel>
+            </Border>
+            <Border BorderThickness="1" BorderBrush="{StaticResource AntDesign.BorderColorBaseBrush}" Margin="2" >
+                <StackPanel Margin="20">
+                    <hc:Row Margin="0,0,0,0" Gutter="20">
+                        <hc:Col Span="12">
+                            <hc:TextBox hc:TitleElement.Title="供应商全称" hc:TitleElement.TitlePlacement="Left" hc:InfoElement.Necessary="True" 
+                                        Text="{Binding Model.FullName ,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged , ValidatesOnDataErrors=True ,ValidatesOnExceptions=True,NotifyOnValidationError=True}"
+                                        ></hc:TextBox>
+                        </hc:Col>
+                        <hc:Col Span="12">
+                            <hc:TextBox hc:TitleElement.Title="供应商简称" hc:TitleElement.TitlePlacement="Left" hc:InfoElement.Necessary="True" 
+                                        Text="{Binding Model.ShortName ,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged , ValidatesOnDataErrors=True ,ValidatesOnExceptions=True,NotifyOnValidationError=True}"
+                                        ></hc:TextBox>
+                        </hc:Col>
+                    </hc:Row>
+                    <hc:Row Margin="0,30,0,0" Gutter="20">
+                        <hc:Col Span="12">
+                            <hc:TextBox hc:TitleElement.Title="采购经理" hc:TitleElement.TitlePlacement="Left" hc:InfoElement.Necessary="False"
+                                        Text="{Binding Model.Manager ,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged , ValidatesOnDataErrors=True ,ValidatesOnExceptions=True,NotifyOnValidationError=True}"
+                                        ></hc:TextBox>
+                        </hc:Col>
+                        <hc:Col Span="12">
+                            <hc:TextBox hc:TitleElement.Title="采购经理电话" hc:TitleElement.TitlePlacement="Left" hc:InfoElement.Necessary="False"
+                                        Text="{Binding Model.ManagerTel ,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged , ValidatesOnDataErrors=True ,ValidatesOnExceptions=True,NotifyOnValidationError=True}"
+                                        ></hc:TextBox>
+                        </hc:Col>
+                    </hc:Row>
+                    <hc:Row Margin="0,30,0,0" Gutter="20">
+                        <hc:Col Span="12">
+                            <hc:TextBox hc:TitleElement.Title="供应商编码" hc:TitleElement.TitlePlacement="Left" hc:InfoElement.Necessary="False" 
+                                        Text="{Binding Model.Number ,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged , ValidatesOnDataErrors=True ,ValidatesOnExceptions=True,NotifyOnValidationError=True}"
+                                        ></hc:TextBox>
+                        </hc:Col>
+                        
+                        <hc:Col Span="12">
+                            <hc:TextBox hc:TitleElement.Title="备注" hc:TitleElement.TitlePlacement="Left" hc:InfoElement.Necessary="False"
+                                        Text="{Binding Model.Remark ,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged , ValidatesOnDataErrors=True ,ValidatesOnExceptions=True,NotifyOnValidationError=True}"
+                                        ></hc:TextBox>
+                        </hc:Col>
+                    </hc:Row>
+                </StackPanel>
+            </Border>
+        </DockPanel>
+        <hc:LoadingCircle Visibility="{Binding IsLoading, UpdateSourceTrigger=PropertyChanged,Converter={dxmvvm:BooleanToVisibilityConverter}}"/>
+    </Grid>
+</UserControl>

@@ -1,0 +1,43 @@
+﻿<UserControl x:Class="Lanpuda.Client.Start.Cores.Welcomes.WelcomeView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:Lanpuda.Client.Start.Cores.Welcomes" 
+             xmlns:hc="https://handyorg.github.io/handycontrol"
+             mc:Ignorable="d" 
+             d:DesignHeight="900" d:DesignWidth="1600">
+    <ScrollViewer Background="{StaticResource AntDesign.PrimaryBackgroundColorBrush}">
+        <StackPanel>
+            <Grid Background="White">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="40"></RowDefinition>
+                    <RowDefinition Height="120"></RowDefinition>
+                </Grid.RowDefinitions>
+                <TextBlock Text="首页  /  工作台" Style="{StaticResource TextBlockDefaultThiLight}" HorizontalAlignment="Left" Margin="25,0,0,0"></TextBlock>
+                <Grid Grid.Row="1" Margin="25,0,0,0">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition></ColumnDefinition>
+                        <ColumnDefinition></ColumnDefinition>
+                    </Grid.ColumnDefinitions>
+                    <StackPanel VerticalAlignment="Center">
+                        <TextBlock Text="工作台" Style="{StaticResource TextBlockTitle}" HorizontalAlignment="Left" Margin="0,0,0,5" ></TextBlock>
+                        <StackPanel Orientation="Horizontal" Margin="0,5,0,0">
+                            <hc:Gravatar Style="{StaticResource GravatarCircleImg}" Margin="0">
+                                <Image Source="{Binding Avatar}"/>
+                            </hc:Gravatar>
+                            <StackPanel VerticalAlignment="Center" Margin="20,0,0,0" >
+                                <TextBlock Text="早安，山治，我要吃肉！" Style="{StaticResource TextBlockTitle}" HorizontalAlignment="Left" Margin="0,0,0,5" ></TextBlock>
+
+                                <TextBlock Text="假砖家 | 地球－伟大航道－黄金梅丽号－厨房－小强部门" Style="{StaticResource TextBlockDefaultThiLight}" Margin="0,5,0,0" ></TextBlock>
+                            </StackPanel>
+                        </StackPanel>
+                    </StackPanel>
+                </Grid>
+            </Grid>
+
+            <TextBlock Text="{Binding Employees,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}" FontSize="22"></TextBlock>
+            <Button Content="测试ViewModel热重载" Command="{Binding TestCommand}"></Button>
+        </StackPanel>
+    </ScrollViewer>
+</UserControl>

@@ -1,0 +1,65 @@
+﻿<UserControl x:Class="Lanpuda.Lims.UI.Records.BatchCreates.RecordBatchCreateView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:Lanpuda.Lims.UI.Records.BatchCreates"
+             mc:Ignorable="d" 
+              xmlns:hc="https://handyorg.github.io/handycontrol" 
+             xmlns:widget="clr-namespace:Lanpuda.Client.Widget;assembly=Lanpuda.Client.Widget" 
+             xmlns:dxmvvm="http://schemas.devexpress.com/winfx/2008/xaml/mvvm"
+             d:DesignHeight="900" d:DesignWidth="1600">
+    <UserControl.Resources>
+        
+    </UserControl.Resources>
+    <dxmvvm:Interaction.Behaviors>
+        <dxmvvm:EventToCommand EventName="Loaded" Command="{Binding InitializeAsyncCommand}"/>
+        <dxmvvm:WindowService AllowSetWindowOwner="True" WindowStartupLocation="CenterOwner" WindowShowMode="Dialog">
+            <dxmvvm:WindowService.WindowStyle>
+                <Style TargetType="Window">
+                    <Setter Property="WindowStyle" Value="SingleBorderWindow" />
+                    <Setter Property="ShowInTaskbar" Value="False"></Setter>
+                </Style>
+            </dxmvvm:WindowService.WindowStyle>
+        </dxmvvm:WindowService>
+        <dxmvvm:CurrentWindowService />
+    </dxmvvm:Interaction.Behaviors>
+    <Grid>
+        <DockPanel Background="{StaticResource AntDesign.PrimaryBackgroundColorBrush}" 
+               IsEnabled="{Binding IsLoading,Converter={StaticResource Boolean2BooleanReConverter}}">
+           
+            <Border DockPanel.Dock="Bottom" Style="{StaticResource BorderRegion}" Margin="0">
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+                    <Button Command="{Binding CloseCommand}" Content="关闭" 
+                            Style="{StaticResource ButtonDefault}" Margin="10,0"></Button>
+                    <Button Command="{Binding SaveAsyncCommand}" Content="保存" CommandParameter="true" Style="{StaticResource ButtonPrimary}" Margin="10,0"></Button>
+                </StackPanel>
+            </Border>
+
+            <Border Style="{StaticResource BorderRegion}" Margin="5">
+                <DataGrid Style="{StaticResource AntDesign.DataGrid.Editable}" Margin="0" SelectionMode="Single" RowHeight="70"
+                          SelectedItem="{Binding Model.SelectedRow,Mode=TwoWay}" VerticalScrollBarVisibility="Auto" 
+                          hc:DataGridAttach.ShowRowNumber="True"  HeadersVisibility="All" CanUserSortColumns="False"
+                          ItemsSource="{Binding Model.Details,Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" >
+                    <DataGrid.Columns>
+                        <DataGridTextColumn Binding="{Binding ProductSpec}" Header="样品编号" MinWidth="150"  IsReadOnly="True"/>
+                        <DataGridTextColumn Binding="{Binding ProductName}" Header="样品名称" MinWidth="150"  IsReadOnly="True"/>
+                        <DataGridTextColumn Binding="{Binding ProductName}" Header="IA" MinWidth="150"  IsReadOnly="True"/>
+                        <DataGridTextColumn Binding="{Binding ProductName}" Header="DBP" MinWidth="150"  IsReadOnly="True"/>
+                        <DataGridTextColumn Binding="{Binding ProductName}" Header="IPH" MinWidth="150"  IsReadOnly="True"/>
+                        <DataGridTextColumn Binding="{Binding ProductName}" Header="硬度" MinWidth="150"  IsReadOnly="True"/>
+                       
+                    </DataGrid.Columns>
+                    <DataGrid.ContextMenu>
+                        <ContextMenu  StaysOpen="true">
+                            <MenuItem Command="{Binding ShowSelectProductWindowCommand}"  Header="添加样品" Style="{StaticResource MenuItemBaseStyle}"/>
+                            <MenuItem Command="{Binding DeleteSelectedRowCommand}"  Header="删除" Style="{StaticResource MenuItemBaseStyle}"/>
+                            <MenuItem Command="{Binding DeleteSelectedRowCommand}"  Header="设置检验项目" Style="{StaticResource MenuItemBaseStyle}"/>
+                        </ContextMenu>
+                    </DataGrid.ContextMenu>
+                </DataGrid>
+            </Border>
+        </DockPanel>
+        <hc:LoadingCircle Visibility="{Binding IsLoading, UpdateSourceTrigger=PropertyChanged,Converter={dxmvvm:BooleanToVisibilityConverter}}"/>
+    </Grid>
+</UserControl>

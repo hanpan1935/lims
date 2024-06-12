@@ -1,0 +1,426 @@
+﻿<UserControl x:Class="Lanpuda.Lims.UI.Records.RecordPagedView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:Lanpuda.Lims.UI.Records"
+             mc:Ignorable="d" 
+             xmlns:hc="https://handyorg.github.io/handycontrol" 
+             xmlns:dxmvvm="http://schemas.devexpress.com/winfx/2008/xaml/mvvm"
+             xmlns:widget="clr-namespace:Lanpuda.Client.Widget;assembly=Lanpuda.Client.Widget" 
+             xmlns:mvvm="clr-namespace:Lanpuda.Client.Mvvm;assembly=Lanpuda.Client.Mvvm"
+             xmlns:alc="clr-namespace:Lanpuda.Client.Theme.ACL;assembly=Lanpuda.Client.Theme"
+             xmlns:converters="clr-namespace:Lanpuda.Client.Theme.Converters;assembly=Lanpuda.Client.Theme"
+             xmlns:limsConverters="clr-namespace:Lanpuda.Lims.UI.Assets.Converts"
+             xmlns:langs ="clr-namespace:Lanpuda.Lims.UI.Assets.Langs"
+             xmlns:permissions ="clr-namespace:Lanpuda.Lims.Permissions;assembly=Lanpuda.Lims.Application.Contracts"
+             d:DesignHeight="900" d:DesignWidth="1600">
+    <UserControl.Resources>
+        <converters:DisplayAttributeToStringConverter x:Key="DisplayAttributeToStringConverter"></converters:DisplayAttributeToStringConverter>
+        <converters:BoolToStringConverter x:Key="BoolToStringConverter"></converters:BoolToStringConverter>
+        <limsConverters:IsQualifiedToStringConvert x:Key="IsQualifiedToStringConvert"></limsConverters:IsQualifiedToStringConvert>
+    </UserControl.Resources>
+    <dxmvvm:Interaction.Behaviors>
+        <dxmvvm:EventToCommand EventName="Loaded" Command="{Binding InitializeAsyncCommand}"/>
+        <dxmvvm:WindowService AllowSetWindowOwner="True" WindowStartupLocation="CenterScreen" WindowShowMode="Dialog">
+            <dxmvvm:WindowService.WindowStyle>
+                <Style TargetType="Window">
+                    <Setter Property="WindowStyle" Value="SingleBorderWindow" />
+                    <Setter Property="SizeToContent" Value="Manual" />
+                    <Setter Property="ShowInTaskbar" Value="False"></Setter>
+                </Style>
+            </dxmvvm:WindowService.WindowStyle>
+        </dxmvvm:WindowService>
+        <dxmvvm:WindowService AllowSetWindowOwner="True" WindowStartupLocation="CenterOwner"  WindowShowMode="Dialog" Name="TaskWindow">
+            <dxmvvm:WindowService.WindowStyle>
+                <Style TargetType="Window">
+                    <Setter Property="Width" Value="800" />
+                    <Setter Property="Height" Value="500" />
+                </Style>
+            </dxmvvm:WindowService.WindowStyle>
+        </dxmvvm:WindowService>
+    </dxmvvm:Interaction.Behaviors>
+    <Grid Background="{StaticResource AntDesign.PrimaryBackgroundColorBrush}">
+        <DockPanel Background="Transparent" IsEnabled="{Binding IsLoading, Converter={StaticResource Boolean2BooleanReConverter}}">
+            <widget:PageHeaderSimple DockPanel.Dock="Top" Title="{Binding PageTitle}"/>
+            <!--搜索-->
+            <StackPanel DockPanel.Dock="Top" Orientation="Vertical" Margin="5" Background="White">
+                <hc:Row Margin="5" Gutter="20">
+                    <hc:Col Span="4">
+                        <hc:TextBox Text="{Binding Number,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}"
+                                    hc:TitleElement.Title="记录编号" hc:TitleElement.TitlePlacement="Left"></hc:TextBox>
+                    </hc:Col>
+
+
+                    <hc:Col Span="4">
+                        <hc:TextBox Text="{Binding SampleNumber,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}"
+                                    hc:TitleElement.Title="样品编号" hc:TitleElement.TitlePlacement="Left"></hc:TextBox>
+                    </hc:Col>
+
+                    <hc:Col Span="4">
+                        <hc:TextBox Text="{Binding Sender,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}"
+                                    hc:TitleElement.Title="送样人" hc:TitleElement.TitlePlacement="Left"></hc:TextBox>
+                    </hc:Col>
+
+                    <hc:Col Span="4">
+                        <hc:ElementGroup Orientation="Horizontal" Layout="Stack">
+                            <hc:ElementGroup.ItemsPanel>
+                                <ItemsPanelTemplate>
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="Auto"/>
+                                            <ColumnDefinition Width="*"/>
+                                            <ColumnDefinition Width="Auto"/>
+                                        </Grid.ColumnDefinitions>
+                                    </Grid>
+                                </ItemsPanelTemplate>
+                            </hc:ElementGroup.ItemsPanel>
+                            <TextBlock  Text="{x:Static langs:Lang.Product}" VerticalAlignment="Center" Margin="0,0,0,0" Grid.Column="0" Width="35" ></TextBlock>
+                            <TextBox IsReadOnly="True" Text="{Binding ProductName,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}" Grid.Column="1"/>
+                            <Button Grid.Column="2" Style="{StaticResource ButtonPrimary}"
+                                        Command="{Binding ShowProductSelectViewCommand}"
+                                        hc:IconElement.Geometry="{StaticResource SearchGeometry}"/>
+                        </hc:ElementGroup>
+                    </hc:Col>
+
+
+                    <hc:Col Span="4">
+                        <hc:ComboBox ItemsSource="{Binding SampleTypeSource}" ShowClearButton="True"
+                                     SelectedValue="{Binding SelectSampleType,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}" 
+                                     DisplayMemberPath="DisplayValue" 
+                                     hc:TitleElement.Title="样品类型" hc:TitleElement.TitlePlacement="Left"></hc:ComboBox>
+                    </hc:Col>
+
+                    <hc:Col Span="4">
+                        <hc:ComboBox ItemsSource="{Binding SamplePropertySource}" ShowClearButton="True"
+                                     SelectedValue="{Binding SelectSampleProperty,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}" 
+                                     DisplayMemberPath="DisplayValue"  
+                                     hc:TitleElement.Title="样品属性" hc:TitleElement.TitlePlacement="Left"></hc:ComboBox>
+                    </hc:Col>
+
+                    <hc:Col Span="4">
+                        <hc:ComboBox ItemsSource="{Binding RatingTypeSource}" ShowClearButton="True"
+                                     SelectedValue="{Binding SelectRatingType,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}" 
+                                     DisplayMemberPath="DisplayValue"  
+                                     hc:TitleElement.Title="判级类型" hc:TitleElement.TitlePlacement="Left"></hc:ComboBox>
+                    </hc:Col>
+
+                    <hc:Col Span="4">
+                        <hc:DatePicker SelectedDate="{Binding SampleTimeStart,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}" 
+                                       hc:TitleElement.Title="来样时间起始" hc:TitleElement.TitlePlacement="Left"></hc:DatePicker>
+                    </hc:Col>
+
+                    <hc:Col Span="4">
+                        <hc:DatePicker SelectedDate="{Binding SampleTimeEnd,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}" 
+                                       hc:TitleElement.Title="来样时间截止" hc:TitleElement.TitlePlacement="Left"></hc:DatePicker>
+                    </hc:Col>
+
+                    <hc:Col Span="4">
+                        <hc:ComboBox SelectedValue="{Binding SelectRatingType,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}" 
+                                     ItemsSource="{Binding RatingTypeSource}" DisplayMemberPath="DisplayValue" 
+                                     ShowClearButton="True"
+                                     hc:TitleElement.Title="{x:Static langs:Lang.RatingType}" hc:TitleElement.TitlePlacement="Left"></hc:ComboBox>
+                    </hc:Col>
+                    
+                    
+                    
+                    <hc:Col Span="4">
+                        <hc:ElementGroup Orientation="Horizontal" Layout="Stack">
+                            <hc:ElementGroup.ItemsPanel>
+                                <ItemsPanelTemplate>
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="Auto"/>
+                                            <ColumnDefinition Width="*"/>
+                                            <ColumnDefinition Width="Auto"/>
+                                        </Grid.ColumnDefinitions>
+                                    </Grid>
+                                </ItemsPanelTemplate>
+                            </hc:ElementGroup.ItemsPanel>
+                            <TextBlock Text="{x:Static langs:Lang.Customer}" VerticalAlignment="Center" Margin="0,0,10,0" Grid.Column="0" ></TextBlock>
+                            <TextBox Text="{Binding CustomerName,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}" Grid.Column="1" IsReadOnly="True"/>
+                            <Button Grid.Column="2" Style="{StaticResource ButtonPrimary}"
+                                    Command="{Binding ShowCustomerSelectViewCommand}"
+                                    hc:IconElement.Geometry="{StaticResource SearchGeometry}"/>
+                        </hc:ElementGroup>
+                    </hc:Col>
+
+
+                    <hc:Col Span="4">
+                        <hc:ElementGroup Orientation="Horizontal" Layout="Stack">
+                            <hc:ElementGroup.ItemsPanel>
+                                <ItemsPanelTemplate>
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="Auto"/>
+                                            <ColumnDefinition Width="*"/>
+                                            <ColumnDefinition Width="Auto"/>
+                                        </Grid.ColumnDefinitions>
+                                    </Grid>
+                                </ItemsPanelTemplate>
+                            </hc:ElementGroup.ItemsPanel>
+                            <TextBlock  Text="{x:Static langs:Lang.Supplier}" VerticalAlignment="Center" Margin="0,0,10,0" Grid.Column="0"></TextBlock>
+                            <TextBox Text="{Binding SupplierName,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}" Grid.Column="1" IsReadOnly="True"/>
+                            <Button Grid.Column="2" Style="{StaticResource ButtonPrimary}"
+                                    Command="{Binding ShowSupplierSelectViewCommand}"
+                                    hc:IconElement.Geometry="{StaticResource SearchGeometry}"/>
+                        </hc:ElementGroup>
+                    </hc:Col>
+
+
+
+                    <hc:Col Span="4">
+                        <StackPanel Orientation="Horizontal">
+                            <Button Content="查询" Command="{Binding QueryAsyncCommand}" Style="{DynamicResource ButtonPrimary}" Margin="0,0,0,0"   Cursor="Hand"></Button>
+                            <Button Content="重置" Command="{Binding ResetAsyncCommand}" Style="{DynamicResource ButtonDefault}" Margin="20,0,0,0"  Cursor="Hand"></Button>
+                            <Button Content="切换视图" Command="{Binding ShowItemViewCommand}" Style="{DynamicResource ButtonDefault}" Margin="20,0,0,0"  Cursor="Hand"></Button>
+                        </StackPanel>
+                    </hc:Col>
+                </hc:Row>
+                <hc:Row Margin="5">
+                    <hc:Col Span="6">
+                        <StackPanel Orientation="Horizontal">
+                            <Button Command="{Binding CreateCommand}" Content="新建" Cursor="Hand" 
+                                    alc:PermissionControl.PermissionName="{x:Static permissions:LimsPermissions.Record_Default}"
+                                    Style="{StaticResource ButtonPrimary}"></Button>
+                        </StackPanel>
+                    </hc:Col>
+                </hc:Row>
+            </StackPanel>
+            <!--分页-->
+            <StackPanel DockPanel.Dock="Bottom"  Orientation="Horizontal" HorizontalAlignment="Right" >
+                <ComboBox  hc:DropDownElement.ConsistentWidth="False" ItemsSource="{Binding PageSizeList}" 
+                           DisplayMemberPath="Key" SelectedValuePath="Value" 
+                           SelectedValue="{Binding DataCountPerPage}" >
+                </ComboBox>
+                <hc:Pagination MaxPageCount="{Binding MaxPageCount ,UpdateSourceTrigger=PropertyChanged}"   
+                                   DataCountPerPage="{Binding DataCountPerPage,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}" 
+                                   PageIndex="{Binding PageIndex,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}"  
+                                   IsJumpEnabled="True" HorizontalAlignment="Right" Margin="0,0,10,0">
+                    <hc:Interaction.Triggers>
+                        <hc:EventTrigger EventName="PageUpdated">
+                            <hc:EventToCommand Command="{Binding PageUpdatedAsyncCommand}" PassEventArgsToCommand="True" />
+                        </hc:EventTrigger>
+                    </hc:Interaction.Triggers>
+                </hc:Pagination>
+            </StackPanel>
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="*"/>
+                </Grid.RowDefinitions>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="6*"/>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="4*"/>
+                </Grid.ColumnDefinitions>
+                <DataGrid Style="{StaticResource AntDesign.DataGridCommon.Paged}">
+                    <DataGrid.Columns >
+                        <DataGridTextColumn Binding="{Binding Number}" Header="记录编号" Width="1*" MinWidth="150"/>
+                        <DataGridTextColumn Binding="{Binding SampleNumber}" Header="样品编号" Width="1*" MinWidth="150"/>
+                        <DataGridTextColumn Binding="{Binding ProductName}" Header="产品名称" Width="1*" MinWidth="100"/>
+                        <DataGridTextColumn Binding="{Binding DicSampleTypeDisplayValue}" Header="样品类型" Width="1*" MinWidth="100"/>
+                        <DataGridTextColumn Binding="{Binding DicSamplePropertyDisplayValue}" Header="样品属性" Width="1*" MinWidth="150"/>
+                        <DataGridTextColumn Binding="{Binding DicRatingTypeDisplayValue}" Header="判级结果" Width="1*" MinWidth="150"/>
+                    </DataGrid.Columns>
+                </DataGrid>
+                <GridSplitter Grid.Row="0" Grid.Column="1" Width="3" Margin="2,0,2,0" Background="{StaticResource AntDesign.BorderColorBaseBrush}"
+                               VerticalAlignment="Stretch" HorizontalAlignment="Center"/>
+                <DockPanel Background="{StaticResource AntDesign.PrimaryBackgroundColorBrush}"
+                           Visibility="{Binding SelectedModel,Converter={StaticResource Object2VisibilityConverter}}" Margin="0,0" Grid.Column="2">
+                    <StackPanel Width="50" DockPanel.Dock="Right" Background="White" Margin="5,0">
+                        <Button Command="{Binding UpdateCommand}" Content="编辑" Cursor="Hand" 
+                                alc:PermissionControl.PermissionName="{x:Static permissions:LimsPermissions.Record_Update}"
+                                Style="{StaticResource ButtonPrimary.Small}" Margin="0,10"></Button>
+                        <Button Command="{Binding DeleteAsyncCommand}" Content="删除" Cursor="Hand" 
+                                alc:PermissionControl.PermissionName="{x:Static permissions:LimsPermissions.Record_Delete}"
+                                Style="{StaticResource ButtonPrimary.Small}"/>
+                    </StackPanel>
+
+                    <ScrollViewer>
+                        <Border Style="{StaticResource BorderRegion}" Margin="5">
+                            <StackPanel>
+                                <Border  Margin="10,0">
+                                    <StackPanel>
+                                        <hc:Divider Content="基本信息" Margin="0,10"/>
+                                        <hc:Row Margin="0,10,0,0">
+                                            <hc:Col Span="12">
+                                                <hc:TextBox hc:TitleElement.Title="记录编号:"  IsReadOnly="True"
+                                            BorderThickness="0" Text="{Binding SelectedModel.Number}"
+                                            hc:TitleElement.TitlePlacement="Left">
+                                                </hc:TextBox>
+                                            </hc:Col>
+                                            <hc:Col Span="12">
+                                                <hc:TextBox hc:TitleElement.Title="判级结果:"  IsReadOnly="True"
+                                            BorderThickness="0" Text="{Binding SelectedModel.DicRatingTypeDisplayValue}"
+                                            hc:TitleElement.TitlePlacement="Left">
+                                                </hc:TextBox>
+                                            </hc:Col>
+                                        </hc:Row>
+                                        <hc:Row Margin="0,10,0,0">
+                                            <hc:Col Span="24">
+                                                <hc:TextBox hc:TitleElement.Title="备注:" IsReadOnly="True"
+                                                    BorderThickness="0" Text="{Binding SelectedModel.Remark}"
+                                                    hc:TitleElement.TitlePlacement="Left">
+                                                </hc:TextBox>
+                                            </hc:Col>
+                                        </hc:Row>
+                                       
+                                    </StackPanel>
+                                </Border>
+
+                                <Border  Margin="10,0">
+                                    <StackPanel>
+                                        <hc:Divider Content="样品信息" Margin="0,10"/>
+                                        <hc:Row Margin="0,10,0,0">
+                                            <hc:Col Span="12">
+                                                <hc:TextBox hc:TitleElement.Title="样品编号:"  IsReadOnly="True"
+                                            BorderThickness="0" Text="{Binding SelectedModel.SampleNumber}"
+                                            hc:TitleElement.TitlePlacement="Left">
+                                                </hc:TextBox>
+                                            </hc:Col>
+                                            <hc:Col Span="12">
+                                                <hc:TextBox hc:TitleElement.Title="产品名称:"  IsReadOnly="True"
+                                            BorderThickness="0" Text="{Binding SelectedModel.ProductName}"
+                                            hc:TitleElement.TitlePlacement="Left">
+                                                </hc:TextBox>
+                                            </hc:Col>
+                                        </hc:Row>
+                                        <hc:Row Margin="0,10,0,0">
+                                            <hc:Col Span="12">
+                                                <hc:TextBox hc:TitleElement.Title="样品类型:" IsReadOnly="True"
+                                                    BorderThickness="0" Text="{Binding SelectedModel.DicSampleTypeDisplayValue}"
+                                                    hc:TitleElement.TitlePlacement="Left">
+                                                </hc:TextBox>
+                                            </hc:Col>
+                                            <hc:Col Span="12">
+                                                <hc:TextBox hc:TitleElement.Title="样品属性:" IsReadOnly="True"
+                                            BorderThickness="0" Text="{Binding SelectedModel.DicSamplePropertyDisplayValue,Mode=OneWay}"
+                                            hc:TitleElement.TitlePlacement="Left"></hc:TextBox>
+                                            </hc:Col>
+                                        </hc:Row>
+                                        <hc:Row Margin="0,10,0,0">
+                                            <hc:Col Span="12">
+                                                <hc:TextBox hc:TitleElement.Title="来样时间:" IsReadOnly="True"
+                                                    BorderThickness="0" Text="{Binding SelectedModel.SampleTime,StringFormat={}{0:yyyy-MM-dd HH:mm}}"
+                                                    hc:TitleElement.TitlePlacement="Left">
+                                                </hc:TextBox>
+                                            </hc:Col>
+                                            <hc:Col Span="12">
+                                                <hc:TextBox hc:TitleElement.Title="过期日期:" IsReadOnly="True"
+                                            BorderThickness="0" Text="{Binding SelectedModel.ExpireTime,Mode=OneWay,StringFormat={}{0:yyyy-MM-dd}}"
+                                            hc:TitleElement.TitlePlacement="Left"></hc:TextBox>
+                                            </hc:Col>
+                                        </hc:Row>
+
+                                        <hc:Row Margin="0,10,0,0">
+                                            <hc:Col Span="12">
+                                                <hc:TextBox hc:TitleElement.Title="样品数量:" IsReadOnly="True"
+                                                    BorderThickness="0" Text="{Binding SelectedModel.SampleCount}"
+                                                    hc:TitleElement.TitlePlacement="Left">
+                                                </hc:TextBox>
+                                            </hc:Col>
+                                            <hc:Col Span="12">
+                                                <hc:TextBox hc:TitleElement.Title="送样人:" IsReadOnly="True"
+                                            BorderThickness="0" Text="{Binding SelectedModel.Sender,Mode=OneWay}"
+                                            hc:TitleElement.TitlePlacement="Left"></hc:TextBox>
+                                            </hc:Col>
+                                        </hc:Row>
+
+                                        <hc:Row Margin="0,10,0,0">
+                                            <hc:Col Span="12">
+                                                <hc:TextBox hc:TitleElement.Title="客户:" IsReadOnly="True"
+                                                    BorderThickness="0" Text="{Binding SelectedModel.CustomerShortName}"
+                                                    hc:TitleElement.TitlePlacement="Left">
+                                                </hc:TextBox>
+                                            </hc:Col>
+                                            <hc:Col Span="12">
+                                                <hc:TextBox hc:TitleElement.Title="供应商:" IsReadOnly="True"
+                                            BorderThickness="0" Text="{Binding SelectedModel.SupplierShortName,Mode=OneWay}"
+                                            hc:TitleElement.TitlePlacement="Left"></hc:TextBox>
+                                            </hc:Col>
+                                        </hc:Row>
+
+                                    </StackPanel>
+                                </Border>
+
+                                <Border CornerRadius="4,4,0,0" Style="{StaticResource BorderRegion}" BorderThickness="0">
+                                    <StackPanel>
+                                        <hc:Divider Content="数据明细"  Margin="0,10"/>
+                                        <DataGrid ItemsSource="{Binding SelectedModel.Details}" 
+                                                  Margin="0"
+                                                  HorizontalScrollBarVisibility="Auto" 
+                                            Style="{StaticResource AntDesign.DataGridCommon}">
+                                            <DataGrid.Columns>
+                                                <DataGridTextColumn Binding="{Binding InspectionItemFullName}" Header="检验项目" Width="1*"/>
+                                                <DataGridTextColumn Binding="{Binding Standard}" Header="检验标准" Width="1*"/>
+                                                <DataGridTextColumn Binding="{Binding ResultValue}" Header="检验值" Width="1*"/>
+                                                <DataGridTextColumn Binding="{Binding IsQualified,Converter={StaticResource IsQualifiedToStringConvert}}" Header="是否合格"  Width="1*"/>
+                                                <DataGridTemplateColumn Header="操作"  MinWidth="100" Width="1*" >
+                                                    <DataGridTemplateColumn.CellTemplate>
+                                                        <DataTemplate>
+                                                            <StackPanel Orientation="Horizontal" >
+                                                                <Button Command="{Binding DataContext.ShowCreateTaskViewCommand,RelativeSource= {RelativeSource AncestorType=UserControl}}" 
+                                                                        CommandParameter="{Binding Id}"
+                                                                        Content="创建任务" Margin="5" Style="{DynamicResource AntDesign.LinkButtonStyle}"/>
+                                                            </StackPanel>
+                                                        </DataTemplate>
+                                                    </DataGridTemplateColumn.CellTemplate>
+                                                </DataGridTemplateColumn>
+                                            </DataGrid.Columns>
+                                        </DataGrid>
+                                    </StackPanel>
+                                </Border>
+
+
+                                <Border  Margin="10,0">
+                                    <StackPanel>
+                                        <hc:Divider Content="{x:Static langs:Lang.OtherInformation}" Margin="0,10"/>
+                                        <hc:Row Margin="0,10,0,0">
+                                            <hc:Col Span="12">
+                                                <hc:TextBox hc:TitleElement.Title="{x:Static langs:Lang.Creator}" IsReadOnly="True"
+                                                     BorderThickness="0"   hc:TitleElement.TitlePlacement="Left">
+                                                    <hc:TextBox.Text>
+                                                        <MultiBinding StringFormat="{}{0}{1}">
+                                                            <Binding Path="SelectedModel.CreatorSurname" FallbackValue="" />
+                                                            <Binding Path="SelectedModel.CreatorName" FallbackValue="" />
+                                                        </MultiBinding>
+                                                    </hc:TextBox.Text>
+                                                </hc:TextBox>
+                                            </hc:Col>
+                                            <hc:Col Span="12">
+                                                <hc:TextBox hc:TitleElement.Title="{x:Static langs:Lang.CreationTime}" IsReadOnly="True"
+                                            BorderThickness="0" Text="{Binding SelectedModel.CreationTime,StringFormat={}{0:yyyy-MM-dd HH:mm}}"
+                                            hc:TitleElement.TitlePlacement="Left">
+                                                </hc:TextBox>
+                                            </hc:Col>
+                                        </hc:Row>
+                                        <hc:Row Margin="0,10,0,0">
+                                            <hc:Col Span="12">
+                                                <hc:TextBox hc:TitleElement.Title="{x:Static langs:Lang.LastModifier}" IsReadOnly="True"
+                                                     BorderThickness="0"   hc:TitleElement.TitlePlacement="Left">
+                                                    <hc:TextBox.Text>
+                                                        <MultiBinding StringFormat="{}{0}{1}">
+                                                            <Binding Path="SelectedModel.LastModifierSurname" FallbackValue="" />
+                                                            <Binding Path="SelectedModel.LastModifierName" FallbackValue="" />
+                                                        </MultiBinding>
+                                                    </hc:TextBox.Text>
+                                                </hc:TextBox>
+                                            </hc:Col>
+                                            <hc:Col Span="12">
+                                                <hc:TextBox hc:TitleElement.Title="{x:Static langs:Lang.LastModificationTime}" IsReadOnly="True"
+                                                            BorderThickness="0" Text="{Binding SelectedModel.LastModificationTime,StringFormat={}{0:yyyy-MM-dd HH:mm}}"
+                                                            hc:TitleElement.TitlePlacement="Left">
+                                                </hc:TextBox>
+                                            </hc:Col>
+                                        </hc:Row>
+                                    </StackPanel>
+                                </Border>
+                            </StackPanel>
+                        </Border>
+                    </ScrollViewer>
+                </DockPanel>
+            </Grid>
+        </DockPanel>
+        <hc:LoadingCircle Visibility="{Binding IsLoading, UpdateSourceTrigger=PropertyChanged,Converter={dxmvvm:BooleanToVisibilityConverter}}"/>
+    </Grid>
+</UserControl>

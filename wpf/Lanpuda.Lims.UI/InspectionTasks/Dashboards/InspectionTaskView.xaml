@@ -1,0 +1,188 @@
+﻿<UserControl x:Class="Lanpuda.Lims.UI.InspectionTasks.Dashboards.InspectionTaskView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:Lanpuda.Lims.UI.InspectionTasks.Dashboards"
+             mc:Ignorable="d" 
+             xmlns:hc="https://handyorg.github.io/handycontrol" 
+             xmlns:dxmvvm="http://schemas.devexpress.com/winfx/2008/xaml/mvvm"
+             xmlns:widget="clr-namespace:Lanpuda.Client.Widget;assembly=Lanpuda.Client.Widget" 
+             xmlns:mvvm="clr-namespace:Lanpuda.Client.Mvvm;assembly=Lanpuda.Client.Mvvm"
+             xmlns:alc="clr-namespace:Lanpuda.Client.Theme.ACL;assembly=Lanpuda.Client.Theme"
+             xmlns:converters="clr-namespace:Lanpuda.Client.Theme.Converters;assembly=Lanpuda.Client.Theme"
+             xmlns:permissions ="clr-namespace:Lanpuda.Lims.Permissions;assembly=Lanpuda.Lims.Application.Contracts"
+             d:DesignHeight="900" d:DesignWidth="1600">
+    <UserControl.Resources>
+        <converters:DisplayAttributeToStringConverter x:Key="DisplayAttributeToStringConverter"></converters:DisplayAttributeToStringConverter>
+        <converters:BoolToStringConverter x:Key="BoolToStringConverter"></converters:BoolToStringConverter>
+    </UserControl.Resources>
+    <dxmvvm:Interaction.Behaviors>
+        <dxmvvm:EventToCommand EventName="Loaded" Command="{Binding InitializeAsyncCommand}"/>
+        <dxmvvm:WindowService AllowSetWindowOwner="True" WindowStartupLocation="CenterScreen" WindowShowMode="Dialog">
+            <dxmvvm:WindowService.WindowStyle>
+                <Style TargetType="Window">
+                    <Setter Property="Width" Value="800" />
+                    <Setter Property="Height" Value="500" />
+                    <Setter Property="ShowInTaskbar" Value="False"></Setter>
+                </Style>
+            </dxmvvm:WindowService.WindowStyle>
+        </dxmvvm:WindowService>
+
+        <dxmvvm:WindowService AllowSetWindowOwner="True" WindowStartupLocation="CenterOwner" Name="ResultValueEditWindow">
+            <dxmvvm:WindowService.WindowStyle>
+                <Style TargetType="Window">
+                    <Setter Property="Width" Value="300" />
+                    <Setter Property="Height" Value="200" />
+                    <Setter Property="ShowInTaskbar" Value="False"></Setter>
+                </Style>
+            </dxmvvm:WindowService.WindowStyle>
+        </dxmvvm:WindowService>
+
+        <dxmvvm:WindowService AllowSetWindowOwner="True" WindowStartupLocation="CenterOwner" Name="EditWindow">
+            <dxmvvm:WindowService.WindowStyle>
+                <Style TargetType="Window">
+                    <Setter Property="Width" Value="600" />
+                    <Setter Property="Height" Value="400" />
+                    <Setter Property="ShowInTaskbar" Value="False"></Setter>
+                </Style>
+            </dxmvvm:WindowService.WindowStyle>
+        </dxmvvm:WindowService>
+    </dxmvvm:Interaction.Behaviors>
+    <Grid Background="{StaticResource AntDesign.PrimaryBackgroundColorBrush}">
+        <DockPanel Background="Transparent" IsEnabled="{Binding IsLoading, Converter={StaticResource Boolean2BooleanReConverter}}">
+            <widget:PageHeaderSimple DockPanel.Dock="Top" Title="{Binding PageTitle}"/>
+            <!--搜索-->
+            <StackPanel DockPanel.Dock="Top" Orientation="Vertical" Margin="5" Background="White">
+                <hc:Row Margin="5" Gutter="20">
+                    <hc:Col Span="4">
+                        <hc:DatePicker Text="{Binding InspectionDate,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}"
+                                    hc:TitleElement.Title="检验日期" hc:TitleElement.TitlePlacement="Left"></hc:DatePicker>
+                    </hc:Col>
+
+                    <hc:Col Span="4">
+                        <StackPanel Orientation="Horizontal">
+                            <Button Content="任务视图" Command="{Binding ShowInspectionTaskPagedViewCommand}" Style="{DynamicResource ButtonDefault}" Margin="20,0,0,0"  Cursor="Hand"></Button>
+                        </StackPanel>
+                    </hc:Col>
+                </hc:Row>
+                
+            </StackPanel>
+            <!--分页-->
+            <StackPanel DockPanel.Dock="Bottom"  Orientation="Horizontal" HorizontalAlignment="Right" >
+
+            </StackPanel>
+
+            <ItemsControl ItemsSource="{Binding DataList}">
+                <ItemsControl.Template>
+                    <ControlTemplate>
+                        <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled" >
+                            <ItemsPresenter/>
+                        </ScrollViewer>
+                    </ControlTemplate>
+                </ItemsControl.Template>
+                <ItemsControl.ItemsPanel>
+                    <ItemsPanelTemplate>
+                        <WrapPanel></WrapPanel>
+                    </ItemsPanelTemplate>
+                </ItemsControl.ItemsPanel>
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate>
+                        <hc:Card Width="500" Height="400" BorderThickness="0" Effect="{StaticResource EffectShadow2}" Margin="5" Header="{Binding}">
+                            <hc:Card.HeaderTemplate>
+                                <DataTemplate>
+                                    <TextBlock HorizontalAlignment="Left" Style="{StaticResource TextBlockLargeBold}" Text="{Binding EquipmentName}" Margin="10"/>
+                                </DataTemplate>
+                            </hc:Card.HeaderTemplate>
+                            <Border CornerRadius="4,4,0,0" Style="{StaticResource BorderClip}">
+                                <ListBox ItemsSource="{Binding Details}">
+                                    
+                                    <ListBox.Resources>
+                                        <ContextMenu x:Key="MyContextMenu">
+                                            <MenuItem Header="查看明细" Command="{Binding ShowDetailViewCommand}"/>
+                                            <MenuItem Header="修改检测值" alc:PermissionControl.PermissionName="{x:Static permissions:LimsPermissions.InspectionTask_Result}"
+                                                      Command="{Binding ShowEditResultValueViewCommand}"/>
+                                            <MenuItem Header="编辑任务" Command="{Binding ShowEditViewCommand}" 
+                                                      alc:PermissionControl.PermissionName="{x:Static permissions:LimsPermissions.InspectionTask_Update}"/>
+                                        </ContextMenu>
+                                        <Style x:Key="a" TargetType="ListBoxItem" BasedOn="{StaticResource ListBoxItemBaseStyle}">
+                                            <Setter Property="FrameworkElement.Margin" Value="0,0,0,0" />
+                                        </Style>
+                                    </ListBox.Resources>
+                                    <ListBox.ItemContainerStyle>
+                                        <Style TargetType="ListBoxItem" >
+                                            <Setter Property="ContextMenu" Value="{StaticResource MyContextMenu}" />
+                                        </Style>
+                                    </ListBox.ItemContainerStyle>
+                                    <ListBox.ItemTemplate>
+                                        <DataTemplate>
+                                            <Border Style="{StaticResource BorderTipInfo}">
+                                                <dxmvvm:Interaction.Behaviors>
+                                                    <dxmvvm:WindowService AllowSetWindowOwner="True" WindowStartupLocation="CenterScreen" WindowShowMode="Dialog">
+                                                        <dxmvvm:WindowService.WindowStyle>
+                                                            <Style TargetType="Window">
+                                                                <Setter Property="Width" Value="700" />
+                                                                <Setter Property="Height" Value="400" />
+                                                                <Setter Property="ShowInTaskbar" Value="False"></Setter>
+                                                            </Style>
+                                                        </dxmvvm:WindowService.WindowStyle>
+                                                    </dxmvvm:WindowService>
+                                                </dxmvvm:Interaction.Behaviors>
+                                                <Grid>
+                                                    <Grid.ColumnDefinitions>
+                                                        <ColumnDefinition Width="150"></ColumnDefinition>
+                                                        <ColumnDefinition Width="100"></ColumnDefinition>
+                                                        <ColumnDefinition Width="150"></ColumnDefinition>
+                                                        <ColumnDefinition Width="100"></ColumnDefinition>
+                                                    </Grid.ColumnDefinitions>
+
+                                                    <TextBlock Grid.Column="0" TextWrapping="NoWrap" TextTrimming="CharacterEllipsis" 
+                                                               Style="{StaticResource TextBlockDefault}" Text="{Binding SampleNumber}">
+                                                    </TextBlock>
+                                                    <TextBlock Grid.Column="1" TextWrapping="NoWrap" TextTrimming="CharacterEllipsis" 
+                                                           Style="{StaticResource TextBlockDefault}" Text="{Binding ProductName}">
+                                                    </TextBlock>
+
+                                                    <TextBlock Grid.Column="2" TextWrapping="NoWrap" TextTrimming="CharacterEllipsis" Margin="10,0"
+                                                           Style="{StaticResource TextBlockDefault}" Text="{Binding InspectionItemShortName}"/>
+
+                                                    <TextBlock Grid.Column="3" TextWrapping="NoWrap" TextTrimming="CharacterEllipsis" Margin="5,0"
+                                                              Text="{Binding ResultValue}">
+                                                        <TextBlock.Style>
+                                                            <Style TargetType="TextBlock" BasedOn="{StaticResource TextBlockBaseStyle}">
+                                                                <Setter Property="FontSize" Value="16"></Setter>
+                                                                <Style.Triggers>
+                                                                    <DataTrigger Binding="{Binding IsQualified}" Value="False">
+                                                                        <Setter Property="Foreground" Value="Red"></Setter>
+                                                                    </DataTrigger>
+
+                                                                    <DataTrigger Binding="{Binding IsQualified}" Value="True">
+                                                                        <Setter Property="Foreground" Value="Black"></Setter>
+                                                                    </DataTrigger>
+                                                                </Style.Triggers>
+                                                            </Style>
+                                                        </TextBlock.Style>
+                                                    </TextBlock>
+                                                </Grid>
+                                            </Border>
+                                        </DataTemplate>
+                                    </ListBox.ItemTemplate>
+                                </ListBox>
+                            </Border>
+                            <hc:Card.FooterTemplate>
+                                <DataTemplate>
+                                    <StackPanel Margin="10">
+                                        <TextBlock TextWrapping="NoWrap" TextTrimming="CharacterEllipsis" Style="{StaticResource TextBlockLargeBold}" Text="{Binding DataContext.Header,RelativeSource={RelativeSource AncestorType=hc:Card}}" HorizontalAlignment="Left"/>
+                                        <TextBlock TextWrapping="NoWrap" TextTrimming="CharacterEllipsis" Style="{StaticResource TextBlockDefault}" Text="{Binding}" Margin="0,6,0,0" HorizontalAlignment="Left"/>
+                                    </StackPanel>
+                                </DataTemplate>
+                            </hc:Card.FooterTemplate>
+                        </hc:Card>
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
+
+        </DockPanel>
+        <hc:LoadingCircle Visibility="{Binding IsLoading, UpdateSourceTrigger=PropertyChanged,Converter={dxmvvm:BooleanToVisibilityConverter}}"/>
+    </Grid>
+</UserControl>

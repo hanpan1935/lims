@@ -1,0 +1,117 @@
+﻿<UserControl x:Class="Lanpuda.Lims.UI.InspectionMethods.Standards.Edits.StandardEditView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:Lanpuda.Lims.UI.InspectionMethods.Standards.Edits"
+             mc:Ignorable="d" 
+             xmlns:hc="https://handyorg.github.io/handycontrol" 
+             xmlns:widget="clr-namespace:Lanpuda.Client.Widget;assembly=Lanpuda.Client.Widget" 
+             xmlns:dxmvvm="http://schemas.devexpress.com/winfx/2008/xaml/mvvm"
+             d:DesignHeight="800" d:DesignWidth="1400">
+    <dxmvvm:Interaction.Behaviors>
+        <dxmvvm:EventToCommand EventName="Loaded" Command="{Binding InitializeAsyncCommand}"/>
+        <dxmvvm:WindowService AllowSetWindowOwner="True" WindowStartupLocation="CenterOwner" WindowShowMode="Dialog">
+            <dxmvvm:WindowService.WindowStyle>
+                <Style TargetType="Window">
+                    <Setter Property="WindowStyle" Value="SingleBorderWindow" />
+                    <Setter Property="ShowInTaskbar" Value="False"></Setter>
+                </Style>
+            </dxmvvm:WindowService.WindowStyle>
+        </dxmvvm:WindowService>
+        <dxmvvm:CurrentWindowService />
+    </dxmvvm:Interaction.Behaviors>
+   
+    <Grid>
+        <DockPanel Background="{StaticResource AntDesign.PrimaryBackgroundColorBrush}" 
+               IsEnabled="{Binding IsLoading,Converter={StaticResource Boolean2BooleanReConverter}}">
+            <Border DockPanel.Dock="Top" Style="{StaticResource BorderRegion}" Margin="5">
+                <StackPanel>
+                    <hc:Row Margin="0,0,0,0" Gutter="20" Height="60" VerticalAlignment="Top">
+                        <hc:Col Span="6">
+                            <hc:TextBox hc:InfoElement.Title="标准描述" hc:InfoElement.Necessary="True"  
+                                Text="{Binding Model.Description,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged ,ValidatesOnDataErrors=True}"
+                                hc:TitleElement.TitlePlacement="Left">
+                            </hc:TextBox>
+                        </hc:Col>
+                        <hc:Col Span="4">
+                            <hc:ComboBox ItemsSource="{Binding StandardTypeSource ,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}"  hc:TitleElement.TitlePlacement="Left"
+                                 DisplayMemberPath="DisplayValue" SelectedValuePath="Id" IsEditable="True" IsTextSearchEnabled="True" IsTextSearchCaseSensitive="True"
+                                 hc:InfoElement.Title="标准类型" hc:InfoElement.Necessary="False" ShowClearButton="True"
+                                 SelectedValue="{Binding Model.DicStandardTypeId,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged , ValidatesOnDataErrors=True ,ValidatesOnExceptions=True,NotifyOnValidationError=True}">
+                            </hc:ComboBox>
+                        </hc:Col>
+                       
+                        <hc:Col Span="6">
+                            <hc:TextBox hc:InfoElement.Title="备注" hc:InfoElement.Necessary="False" 
+                                Text="{Binding Model.Remark,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged ,ValidatesOnDataErrors=True}"
+                                hc:TitleElement.TitlePlacement="Left">
+                            </hc:TextBox>
+                        </hc:Col>
+                    </hc:Row>
+                </StackPanel>
+            </Border>
+            <Border DockPanel.Dock="Bottom" Style="{StaticResource BorderRegion}" Margin="0">
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+                    <Button Command="{Binding CloseCommand}" Content="关闭" 
+                            Style="{StaticResource ButtonDefault}" Margin="10,0"></Button>
+                    <Button Command="{Binding SaveAsyncCommand}" Content="保存" CommandParameter="true" Style="{StaticResource ButtonPrimary}" Margin="10,0"></Button>
+                </StackPanel>
+            </Border>
+
+            <Border Style="{StaticResource BorderRegion}" Margin="5">
+                <DataGrid Style="{StaticResource AntDesign.DataGrid.Editable}" Margin="0" SelectionMode="Single" RowHeight="70"
+                          SelectedItem="{Binding Model.SelectedRow,Mode=TwoWay}" VerticalScrollBarVisibility="Auto" 
+                          hc:DataGridAttach.ShowRowNumber="True"  HeadersVisibility="All" 
+                          ItemsSource="{Binding Model.Details,Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" >
+                    <DataGrid.Columns>
+                        <DataGridTextColumn Binding="{Binding InspectionItemFullName}" MinWidth="200" Header="检验项目全称" Width="1*" IsReadOnly="True"/>
+                        <DataGridTextColumn Binding="{Binding InspectionItemShortName}" MinWidth="200" Header="检验项目简称" Width="1*" IsReadOnly="True"/>
+
+                        <DataGridTemplateColumn CanUserSort="False"  Header="最小值" MinWidth="100" Width="1*">
+                            <DataGridTemplateColumn.CellTemplate>
+                                <DataTemplate>
+                                    <hc:TextBox Text="{Binding MinValue,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged,ValidatesOnDataErrors=True}">
+                                    </hc:TextBox>
+                                </DataTemplate>
+                            </DataGridTemplateColumn.CellTemplate>
+                        </DataGridTemplateColumn>
+
+                        <DataGridTemplateColumn CanUserSort="False"  Header="是否包含最小值" MinWidth="100" Width="1*">
+                            <DataGridTemplateColumn.CellTemplate>
+                                <DataTemplate>
+                                    <CheckBox IsChecked="{Binding HasMinValue,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}">
+                                    </CheckBox>
+                                </DataTemplate>
+                            </DataGridTemplateColumn.CellTemplate>
+                        </DataGridTemplateColumn>
+                        <DataGridTemplateColumn CanUserSort="False"  Header="最大值" MinWidth="100" Width="1*">
+                            <DataGridTemplateColumn.CellTemplate>
+                                <DataTemplate>
+                                    <TextBox Text="{Binding MaxValue,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}">
+                                    </TextBox>
+                                </DataTemplate>
+                            </DataGridTemplateColumn.CellTemplate>
+                        </DataGridTemplateColumn>
+                        <DataGridTemplateColumn CanUserSort="False"  Header="是否包含最大值" MinWidth="100" Width="1*">
+                            <DataGridTemplateColumn.CellTemplate>
+                                <DataTemplate>
+                                    <CheckBox IsChecked="{Binding HasMaxValue,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}">
+                                    </CheckBox>
+                                </DataTemplate>
+                            </DataGridTemplateColumn.CellTemplate>
+                        </DataGridTemplateColumn>
+                    </DataGrid.Columns>
+                    <DataGrid.ContextMenu>
+                        <ContextMenu  StaysOpen="true">
+                            <MenuItem Command="{Binding ShowSelectItemViewCommand}"  Header="添加检验项目" Style="{StaticResource MenuItemBaseStyle}"/>
+                            <MenuItem Command="{Binding DeleteSelectedRowCommand}"  Header="删除检验项目" Style="{StaticResource MenuItemBaseStyle}"/>
+                            <MenuItem Command="{Binding ShowSelectStandardViewCommand}"  Header="调用相似标准" Style="{StaticResource MenuItemBaseStyle}"/>
+                        </ContextMenu>
+                    </DataGrid.ContextMenu>
+                </DataGrid>
+            </Border>
+        </DockPanel>
+        <hc:LoadingCircle Visibility="{Binding IsLoading, UpdateSourceTrigger=PropertyChanged,Converter={dxmvvm:BooleanToVisibilityConverter}}"/>
+    </Grid>
+</UserControl>

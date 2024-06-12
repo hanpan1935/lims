@@ -1,0 +1,14 @@
+﻿<Window x:Class="Lanpuda.Client.Start.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:Lanpuda.Client.Start"
+        mc:Ignorable="d"
+        xmlns:dxmvvm1="clr-namespace:DevExpress.Mvvm.UI.ModuleInjection;assembly=DevExpress.Mvvm.UI"
+        xmlns:mvvm ="clr-namespace:Lanpuda.Client.Mvvm;assembly=Lanpuda.Client.Mvvm"
+        Title="蓝谱达" Height="900" Width="1600">
+    <Grid>
+        <ContentControl dxmvvm1:UIRegion.Region="{x:Static mvvm:RegionNames.MainWindow}"/>
+    </Grid>
+</Window>
