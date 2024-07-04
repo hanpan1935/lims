@@ -3,7 +3,7 @@
 
 ## Project Introduction
 
-    A Laboratory Information Management System (LIMS) suitable for small and medium-sized manufacturing industry, which integrates laboratory related data, sample tracking, analysis results, and instrument management functions to help laboratories improve work efficiency, data accuracy, and compliance.
+ A Laboratory Information Management System (LIMS) suitable for small and medium-sized manufacturing industry, which integrates laboratory related data, sample tracking, analysis results, and instrument management functions to help laboratories improve work efficiency, data accuracy, and compliance.
 
 - Sample management
 
